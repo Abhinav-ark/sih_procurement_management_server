@@ -1,3 +1,4 @@
 2023-10-03T18:49:23.288Z - userLogin - ReferenceError: ParseInt is not defined
 2023-10-03T19:22:52.643Z - getAllProcurements - Error: Table 'Vendor' was not locked with LOCK TABLES
 2023-10-03T19:24:38.979Z - getAllProcurements - Error: Unknown column 'vendorEmail' in 'where clause'
+2023-10-03T20:27:50.493Z - getAllProcurements - Error: Table 'p' was not locked with LOCK TABLES

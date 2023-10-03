@@ -80,9 +80,12 @@ module.exports = {
             try {
 
                 if(req.authorization_tier!=="4"){
-                    await db_connection.query(`LOCK TABLES Procurement READ`);
+                    await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ`);
 
-                    let [procurements] = await db_connection.query(`SELECT * from Procurement`);
+                    let [procurements] = await db_connection.query(`select p.procurement_ID, p.GeM_ID, p.goods_type, p.goods_quantity,
+                    p.vendor_selection, p.vendor_ID, v.vendor_Organization,
+                    v.vendor_Email, v.msme, v.women_owned, v.sc_st, p.Invoice_No,
+                    p.PRC_No, p.CRAC_No, p.Payment_Id from procurement p left join vendor v on p.vendor_ID = v.vendor_ID;`);
 
                     await db_connection.query(`UNLOCK TABLES`);
 
@@ -96,7 +99,7 @@ module.exports = {
                     let [vendor] =await db_connection.query(`SELECT vendor_ID from Vendor WHERE vendor_Email = ?`, [req.body.userEmail]);
                     //console.log(id);
 
-                    let [procurements] = await db_connection.query(`SELECT * from Procurement WHERE vendor_ID = ?`, [vendor[0].vendor_ID]);
+                    let [procurements] = await db_connection.query(`SELECT Procurement_ID, GeM_ID, Goods_type, Goods_quantity, Vendor_selection, Invoice_No, PRC_No, CRAC_No, Payment_ID from Procurement WHERE vendor_ID = ?`, [vendor[0].vendor_ID]);
                     //console.log(procurements);
 
                     await db_connection.query(`UNLOCK TABLES`);
