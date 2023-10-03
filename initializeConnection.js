@@ -1,5 +1,6 @@
 const mysql = require('mysql2');
 
+// user and password is device specific
 const establishConnection = () => {
 
     const db = mysql.createConnection({
