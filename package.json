@@ -1,0 +1,30 @@
+{
+  "name": "sih_server",
+  "version": "1.0.0",
+  "description": "Procurement Management Server for NEEPCO",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Abhinav-ark/sih_procurement_management_server"
+  },
+  "author": "Abhinav R",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Abhinav-ark/sih_procurement_management_server/issues"
+  },
+  "homepage": "https://github.com/Abhinav-ark/sih_procurement_management_server#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "date-and-time": "^3.0.3",
+    "express": "^4.18.2",
+    "helmet": "^7.0.0",
+    "mongoose": "^7.5.3",
+    "mysql2": "^3.6.1",
+    "paseto": "^3.1.4",
+    "validator": "^13.11.0"
+  }
+}

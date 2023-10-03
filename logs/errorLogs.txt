@@ -1,0 +1,1 @@
+2023-10-03T18:49:23.288Z - userLogin - ReferenceError: ParseInt is not defined
