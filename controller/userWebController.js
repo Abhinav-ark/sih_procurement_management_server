@@ -123,6 +123,75 @@ module.exports = {
                 db_connection.release();
             }
         }
+    ],
+
+    createProcurement: [
+        /*
+        JSON
+        {
+            "GeM_ID":<GEM_ID>,
+            "Goods_type":<Goods_type>,
+            "Goods_quantity":<Goods_quantity>,
+            "Vendor_selection":<Vendor_selection>,
+            "Vendor_ID":<vendor_ID>,
+            "Invoice_No":<Invoice_No>
+        }
+        */
+        webTokenValidator,
+        async (req, res) => {
+            if(req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
+            req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
+            req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" || req.authorization_tier==="2" || req.authorization_tier==="3" || req.authorization_tier==="4" ||            
+            (req.authorization_tier!="0" && req.authorization_tier!="1")){
+                return res.status(400).send({ "message": "Access Restricted!" });
+            }
+
+            if(req.body.GeM_ID === null || req.body.GeM_ID === undefined || req.body.GeM_ID === "" || isNaN(req.body.GeM_ID) ||
+            req.body.Goods_type === null || req.body.Goods_type === undefined || req.body.Goods_type === "" ||
+            req.body.Goods_quantity === null || req.body.Goods_quantity === undefined || req.body.Goods_quantity === "" ||
+            req.body.Vendor_selection === null || req.body.Vendor_selection === undefined || req.body.Vendor_selection === "" ||
+            req.body.Vendor_ID === null || req.body.Vendor_ID === undefined || req.body.Vendor_ID === "" || isNaN(req.body.Vendor_ID) ||
+            req.body.Invoice_No === null || req.body.Invoice_No === undefined || req.body.Invoice_No === ""|| isNaN(req.body.Invoice_No)) {
+                return res.status(400).send({ "message": "Missing details." });
+            }
+
+            if(req.body.Vendor_selection!=="bidding" && req.body.Vendor_selection!=="direct-purchase" && req.body.Vendor_selection!=="reverse-auction"){
+                return res.status(400).send({ "message": "Invalid Vendor selection!" });
+            }
+
+            let db_connection = await db.promise().getConnection();
+
+            try {
+                await db_connection.query(`LOCK TABLES Vendor READ, Procurement WRITE, INVOICE WRITE`);
+
+                let [vendor] = await db_connection.query(`SELECT * from Vendor WHERE vendor_ID = ?`, [req.body.Vendor_ID]);
+
+                if(vendor.length===0){
+                    return res.status(400).send({ "message": "Vendor not found!" });
+                }
+
+                let [procurement] = await db_connection.query(`SELECT * from Procurement WHERE GeM_ID = ?`, [req.body.GeM_ID]);
+                let [procurement1] = await db_connection.query(`SELECT * from Procurement WHERE Invoice_No = ?`, [req.body.Invoice_No]);
+
+                if(procurement.length>0 || procurement1.length>0){
+                    return res.status(400).send({"message": "Procurement already exists!"});
+                }
+                await db_connection.query(`INSERT INTO INVOICE (Invoice_No,Invoice_document) VALUES (?,?)`, [req.body.Invoice_No,1]);
+                await db_connection.query(`INSERT into Procurement (GeM_ID, Goods_type, Goods_quantity, Vendor_selection, vendor_ID, Invoice_No) values (?, ?, ?, ?, ?, ?)`, [req.body.GeM_ID, req.body.Goods_type, req.body.Goods_quantity, req.body.Vendor_selection, req.body.Vendor_ID, req.body.Invoice_No]);
+                await db_connection.query(`UNLOCK TABLES`);
+
+                return res.status(400).send({"message": "Procurement created!"});
+
+            } catch (err) {
+                console.log(err);
+                const time = new Date();
+                fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - createProcurement - ${err}\n`);
+                return res.status(500).send({ "message": "Internal Server Error." });
+            } finally {
+                await db_connection.query(`UNLOCK TABLES`);
+                db_connection.release();
+            }
+        }
     ]
 
     

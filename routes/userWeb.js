@@ -6,5 +6,7 @@ router.get('/test', userWebController.test);
 
 router.post('/login', userWebController.userLogin);
 router.get('/getAllProcurements', userWebController.getAllProcurements);
+router.post('/createProcurement', userWebController.createProcurement);
+
 
 module.exports = router;

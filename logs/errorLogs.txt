@@ -2,3 +2,4 @@
 2023-10-03T19:22:52.643Z - getAllProcurements - Error: Table 'Vendor' was not locked with LOCK TABLES
 2023-10-03T19:24:38.979Z - getAllProcurements - Error: Unknown column 'vendorEmail' in 'where clause'
 2023-10-03T20:27:50.493Z - getAllProcurements - Error: Table 'p' was not locked with LOCK TABLES
+2023-10-04T00:16:37.184Z - createProcurement - Error: Cannot add or update a child row: a foreign key constraint fails (`neepco_procurement_management`.`procurement`, CONSTRAINT `procurement_ibfk_1` FOREIGN KEY (`Invoice_No`) REFERENCES `invoice` (`Invoice_No`))
