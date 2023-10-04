@@ -24,3 +24,7 @@ const reInitDatabase = (db) => {
 
 
 module.exports = reInitDatabase;
+
+
+//Procurement_Status
+//0- Waiting for Invoice, 1- Waiting for PRC, 2-Received PRC, 3- Received CRAC, 4-Payment Completed 

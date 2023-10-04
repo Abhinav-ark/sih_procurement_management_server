@@ -1,5 +1,5 @@
-drop table if exists USER;
 drop table if exists Procurement;
+drop table if exists USER;
 drop table if exists Invoice;
 drop table if exists Payment;
 drop table if exists PRC;
@@ -7,10 +7,13 @@ drop table if exists CRAC;
 drop table if exists Vendor;
 CREATE TABLE USER 
 (
+  userID INT NOT NULL AUTO_INCREMENT,
   userEmail varchar(255) NOT NULL,
   userName varchar(255) NOT NULL,
   userRole varchar(1) NOT NULL,
   userPassword varchar(255) NOT NULL,
+  PRIMARY KEY (userID),
+  UNIQUE (userEmail),
   CHECK (userRole = '0' OR userRole = '1' OR userRole = '2' OR userRole = '3'  OR userRole = '4') 
 );
 CREATE TABLE Invoice
@@ -67,18 +70,26 @@ CREATE TABLE Procurement
   PRC_No INT NULL,
   CRAC_No INT NULL,
   Payment_ID INT NULL,
+  Procurement_Status CHAR(1) NOT NULL DEFAULT "0",
+  Procurement_Buyer INT NULL,
+  Procurement_Consignee INT NULL,
+  Procurement_PAO INT NULL,
   PRIMARY KEY (Procurement_ID),
   FOREIGN KEY (Invoice_No) REFERENCES Invoice(Invoice_No),
   FOREIGN KEY (Payment_ID) REFERENCES Payment(Payment_ID),
   FOREIGN KEY (PRC_No) REFERENCES PRC(PRC_No),
   FOREIGN KEY (CRAC_No) REFERENCES CRAC(CRAC_No),
   FOREIGN KEY (Vendor_ID) REFERENCES Vendor(Vendor_ID),
+  FOREIGN KEY (Procurement_Buyer) REFERENCES USER(userID),
+  FOREIGN KEY (Procurement_Consignee) REFERENCES USER(userID),
+  FOREIGN KEY (Procurement_PAO) REFERENCES USER(userID),
   UNIQUE (GeM_ID),
   UNIQUE (Invoice_No),
   UNIQUE (Payment_ID),
   UNIQUE (PRC_No),
   UNIQUE (CRAC_No),
-  CHECK (vendor_selection = 'bidding' or vendor_selection = 'direct-purchase' or vendor_selection = 'reverse-auction')
+  CHECK (vendor_selection = 'bidding' or vendor_selection = 'direct-purchase' or vendor_selection = 'reverse-auction'),
+  CHECK (Procurement_Status = "0" or Procurement_Status = "1" or Procurement_Status = "2" or Procurement_Status = "3" or Procurement_Status = "4")
 );
 
 INSERT INTO USER (userEmail, userName, userRole, userPassword) VALUES ('abhinavramki@gmail.com','Abhinav R','0','abhinav123');
@@ -117,11 +128,11 @@ INSERT INTO VENDOR (Vendor_Organization, Vendor_Email, MSME, Women_Owned, SC_ST)
 INSERT INTO VENDOR (Vendor_Organization, Vendor_Email, MSME, Women_Owned, SC_ST) VALUES ('Thatha Corp.','saravana@gmail.com','0','0','0');
 INSERT INTO VENDOR (Vendor_Organization, Vendor_Email, MSME, Women_Owned, SC_ST) VALUES ('David and Sons','david@gmail.com','0','0','1');
 
-INSERT INTO PROCUREMENT (GeM_ID,goods_type,goods_quantity,vendor_selection,vendor_ID,Invoice_No, PRC_No, CRAC_No, Payment_ID) VALUES(14554,'Coal','100kg','bidding',1,923,1,1,1);
-INSERT INTO PROCUREMENT (GeM_ID,goods_type,goods_quantity,vendor_selection,vendor_ID,Invoice_No, PRC_No, CRAC_No, Payment_ID) VALUES(13454,'Chair','50pieces','direct-purchase',2,934,2,2,2);
-INSERT INTO PROCUREMENT (GeM_ID,goods_type,goods_quantity,vendor_selection,vendor_ID,Invoice_No, PRC_No, CRAC_No, Payment_ID) VALUES(13354,'Coal','200kg','bidding',3,1051,3,3,3);
-INSERT INTO PROCUREMENT(GeM_ID,goods_type,goods_quantity,vendor_selection,vendor_ID,Invoice_No, PRC_No, CRAC_No, Payment_ID) VALUES(16254,'Cement','170kg','bidding',4,1227,4,4,4);
-INSERT INTO PROCUREMENT(GeM_ID,goods_type,goods_quantity,vendor_selection,vendor_ID,Invoice_No, PRC_No, CRAC_No, Payment_ID) VALUES(17854,'Coal','400kg','direct-purchase',5,7273,5,5,5);
+INSERT INTO PROCUREMENT (GeM_ID,goods_type,goods_quantity,vendor_selection,vendor_ID,Invoice_No, PRC_No, CRAC_No, Payment_ID, Procurement_Status, Procurement_Buyer, Procurement_Consignee, Procurement_PAO) VALUES(14554,'Coal','100kg','bidding',1,923,1,1,1,"4",2,3,4);
+INSERT INTO PROCUREMENT (GeM_ID,goods_type,goods_quantity,vendor_selection,vendor_ID,Invoice_No, PRC_No, CRAC_No, Payment_ID, Procurement_Status, Procurement_Buyer, Procurement_Consignee, Procurement_PAO) VALUES(13454,'Chair','50pieces','direct-purchase',2,934,2,2,2,"4",2,3,4);
+INSERT INTO PROCUREMENT (GeM_ID,goods_type,goods_quantity,vendor_selection,vendor_ID,Invoice_No, PRC_No, CRAC_No, Payment_ID, Procurement_Status, Procurement_Buyer, Procurement_Consignee, Procurement_PAO) VALUES(13354,'Coal','200kg','bidding',3,1051,3,3,3,"4",2,3,4);
+INSERT INTO PROCUREMENT(GeM_ID,goods_type,goods_quantity,vendor_selection,vendor_ID,Invoice_No, PRC_No, CRAC_No, Payment_ID, Procurement_Status, Procurement_Buyer, Procurement_Consignee, Procurement_PAO) VALUES(16254,'Cement','170kg','bidding',4,1227,4,4,4,"4",2,3,4);
+INSERT INTO PROCUREMENT(GeM_ID,goods_type,goods_quantity,vendor_selection,vendor_ID,Invoice_No, PRC_No, CRAC_No, Payment_ID, Procurement_Status, Procurement_Buyer, Procurement_Consignee, Procurement_PAO) VALUES(17854,'Coal','400kg','direct-purchase',5,7273,5,5,5,"4",2,3,4);
 
 
 

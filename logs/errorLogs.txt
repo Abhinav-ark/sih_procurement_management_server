@@ -3,3 +3,7 @@
 2023-10-03T19:24:38.979Z - getAllProcurements - Error: Unknown column 'vendorEmail' in 'where clause'
 2023-10-03T20:27:50.493Z - getAllProcurements - Error: Table 'p' was not locked with LOCK TABLES
 2023-10-04T00:16:37.184Z - createProcurement - Error: Cannot add or update a child row: a foreign key constraint fails (`neepco_procurement_management`.`procurement`, CONSTRAINT `procurement_ibfk_1` FOREIGN KEY (`Invoice_No`) REFERENCES `invoice` (`Invoice_No`))
+2023-10-04T08:29:24.852Z - createProcurement - Error: Table 'USER' was not locked with LOCK TABLES
+2023-10-04T08:30:22.018Z - createProcurement - TypeError: Assignment to constant variable.
+2023-10-04T08:30:58.331Z - createProcurement - Error: Column count doesn't match value count at row 1
+2023-10-04T08:33:50.978Z - getAllProcurements - Error: Table 'u_buyer' was not locked with LOCK TABLES

@@ -80,12 +80,16 @@ module.exports = {
             try {
 
                 if(req.authorization_tier!=="4"){
-                    await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ`);
+                    await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ, USER u_Buyer READ, USER u_Consignee READ, USER u_PAO READ`);
 
-                    let [procurements] = await db_connection.query(`select p.procurement_ID, p.GeM_ID, p.goods_type, p.goods_quantity,
-                    p.vendor_selection, p.vendor_ID, v.vendor_Organization,
-                    v.vendor_Email, v.msme, v.women_owned, v.sc_st, p.Invoice_No,
-                    p.PRC_No, p.CRAC_No, p.Payment_Id from procurement p left join vendor v on p.vendor_ID = v.vendor_ID;`);
+                    let [procurements] = await db_connection.query(` select p.procurement_ID, p.GeM_ID, p.goods_type, p.goods_quantity, 
+                    p.vendor_selection, p.vendor_ID, v.vendor_Organization, v.vendor_Email, v.msme, v.women_owned, v.sc_st, p.Invoice_No,
+                    p.PRC_No, p.CRAC_No, p.Payment_Id, p.Procurement_Status as Status, p.Procurement_Buyer as Buyer_ID,
+                    u_Buyer.userName as Buyer, p.Procurement_Consignee as Consignee_ID, u_Consignee.userName as Consignee,
+                    p.Procurement_PAO as Payment_Authority_ID, u_PAO.userName as Payment_Authority
+                    from procurement p left join vendor v on p.vendor_ID = v.vendor_ID LEFT JOIN
+                    user AS u_Buyer ON p.Procurement_Buyer = u_Buyer.userID LEFT JOIN user AS u_Consignee 
+                    ON p.Procurement_Consignee = u_Consignee.userID LEFT JOIN user AS u_PAO ON p.Procurement_PAO = u_PAO.userID;`);
 
                     await db_connection.query(`UNLOCK TABLES`);
 
@@ -94,12 +98,16 @@ module.exports = {
                         "procurements": procurements
                     });
                 }else{
-                    await db_connection.query(`LOCK TABLES Procurement READ, Vendor READ`);
+                    await db_connection.query(`LOCK TABLES Procurement READ, Vendor READ, USER u_buyer READ, USER u_Consignee READ, USER u_PAO READ`);
 
                     let [vendor] =await db_connection.query(`SELECT vendor_ID from Vendor WHERE vendor_Email = ?`, [req.body.userEmail]);
                     //console.log(id);
 
-                    let [procurements] = await db_connection.query(`SELECT Procurement_ID, GeM_ID, Goods_type, Goods_quantity, Vendor_selection, Invoice_No, PRC_No, CRAC_No, Payment_ID from Procurement WHERE vendor_ID = ?`, [vendor[0].vendor_ID]);
+                    let [procurements] = await db_connection.query(` SELECT p.Procurement_ID, p.GeM_ID, p.Goods_type, p.Goods_quantity, p.Vendor_selection,
+                    p.Invoice_No, u_Buyer.userEmail as Buyer, p.PRC_No, p.CRAC_No, u_Consignee.userEmail as Consignee,
+                    p.Payment_ID, u_PAO.userEmail as Payment_Authority, p.Procurement_Status from Procurement p LEFT JOIN USER
+                    AS u_Buyer ON  p.Procurement_Buyer = u_Buyer.userID LEFT JOIN user AS u_Consignee ON p.Procurement_Consignee = u_Consignee.userID
+                    LEFT JOIN user AS u_PAO ON p.Procurement_PAO = u_PAO.userID where p.Vendor_ID = ?;`, [vendor[0].vendor_ID]);
                     //console.log(procurements);
 
                     await db_connection.query(`UNLOCK TABLES`);
@@ -162,7 +170,7 @@ module.exports = {
             let db_connection = await db.promise().getConnection();
 
             try {
-                await db_connection.query(`LOCK TABLES Vendor READ, Procurement WRITE, INVOICE WRITE`);
+                await db_connection.query(`LOCK TABLES Vendor READ, Procurement WRITE, INVOICE WRITE, USER READ`);
 
                 let [vendor] = await db_connection.query(`SELECT * from Vendor WHERE vendor_ID = ?`, [req.body.Vendor_ID]);
 
@@ -177,7 +185,9 @@ module.exports = {
                     return res.status(400).send({"message": "Procurement already exists!"});
                 }
                 await db_connection.query(`INSERT INTO INVOICE (Invoice_No,Invoice_document) VALUES (?,?)`, [req.body.Invoice_No,1]);
-                await db_connection.query(`INSERT into Procurement (GeM_ID, Goods_type, Goods_quantity, Vendor_selection, vendor_ID, Invoice_No) values (?, ?, ?, ?, ?, ?)`, [req.body.GeM_ID, req.body.Goods_type, req.body.Goods_quantity, req.body.Vendor_selection, req.body.Vendor_ID, req.body.Invoice_No]);
+                let [buyer] = await db_connection.query(`Select userID from USER where userEmail = ?`,[req.body.userEmail]);
+                buyer=buyer[0].userID;
+                await db_connection.query(`INSERT into Procurement (GeM_ID, Goods_type, Goods_quantity, Vendor_selection, vendor_ID, Invoice_No, Procurement_status, Procurement_Buyer) values (?, ?, ?, ?, ?, ?, ?, ?)`, [req.body.GeM_ID, req.body.Goods_type, req.body.Goods_quantity, req.body.Vendor_selection, req.body.Vendor_ID, req.body.Invoice_No, "1",buyer]);
                 await db_connection.query(`UNLOCK TABLES`);
 
                 return res.status(400).send({"message": "Procurement created!"});
