@@ -192,7 +192,46 @@ module.exports = {
                 db_connection.release();
             }
         }
-    ]
+    ],
 
-    
+    deleteProcurement: [
+        /*
+        JSON
+        {
+            "Procurement_ID":<Procurement_ID>
+        }
+        */
+        webTokenValidator,
+        async (req,res) => {
+            if(req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
+            req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
+            req.authorization_tier !== '0'){
+                return res.status(400).send({ "message": "Access Restricted!" });
+            }
+
+            let db_connection = await db.promise().getConnection();
+            
+            try{
+                await db_connection.query(`LOCK TABLES Procurement WRITE`);
+
+                let [procurement] = await db_connection.query(`DELETE from Procurement WHERE Procurement_ID = ?`, [req.body.Procurement_ID]);
+
+                if (procurement.affectedRows === 0) {
+                    await db_connection.query(`UNLOCK TABLES`);
+                    return res.status(400).send({ "message": "Invalid Procurement_ID!" });
+                }
+
+                return res.status(400).send({ "message": "Procurement Deleted!" });
+
+            }catch(e){
+                console.log(err);
+                const time = new Date();
+                fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - deleteProcurement - ${err}\n`);
+                return res.status(500).send({ "message": "Internal Server Error." });
+            }finally{
+                await db_connection.query(`UNLOCK TABLES`);
+                db_connection.release();
+            }
+        }
+    ]  
 }
