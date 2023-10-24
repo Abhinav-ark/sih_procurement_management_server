@@ -21,7 +21,7 @@ module.exports = {
         }
         */
         if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
-        req.body.userPassword === null || req.body.userPassword === undefined || req.body.userPassword === "") {
+            req.body.userPassword === null || req.body.userPassword === undefined || req.body.userPassword === "") {
             return res.status(400).send({ "message": "Missing details." });
         }
 
@@ -44,13 +44,13 @@ module.exports = {
                 const userRole = Roles[parseInt(user[0].userRole)];
 
                 return res.status(200).send({
-                    "message": user[0].userRole==='0'?"Admin logged in":"User logged in!",
+                    "message": user[0].userRole === '0' ? "Admin logged in" : "User logged in!",
                     "SECRET_TOKEN": secret_token,
                     "userEmail": user[0].userEmail,
                     "userName": user[0].userName,
                     "userRole": userRole
                 });
-            }else{
+            } else {
                 return res.status(400).send({ "message": "Invalid email or password!" });
             }
         } catch (err) {
@@ -67,10 +67,10 @@ module.exports = {
     getAllProcurements: [
         webTokenValidator,
         async (req, res) => {
-            if(req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
-            req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
-            req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" ||
-            (req.authorization_tier!="0" && req.authorization_tier!="1" && req.authorization_tier!="2" && req.authorization_tier!="3" && req.authorization_tier!="4")){
+            if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
+                req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
+                req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" ||
+                (req.authorization_tier != "0" && req.authorization_tier != "1" && req.authorization_tier != "2" && req.authorization_tier != "3" && req.authorization_tier != "4")) {
                 return res.status(400).send({ "message": "Access Restricted!" });
             }
 
@@ -79,7 +79,7 @@ module.exports = {
 
             try {
 
-                if(req.authorization_tier!=="4"){
+                if (req.authorization_tier !== "4") {
                     await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ, USER u_Buyer READ, USER u_Consignee READ, USER u_PAO READ`);
 
                     let [procurements] = await db_connection.query(` select p.procurement_ID, p.GeM_ID, p.goods_type, p.goods_quantity, 
@@ -97,10 +97,10 @@ module.exports = {
                         "message": "All Procurements fetched successfully!",
                         "procurements": procurements
                     });
-                }else{
+                } else {
                     await db_connection.query(`LOCK TABLES Procurement READ, Vendor READ, USER u_buyer READ, USER u_Consignee READ, USER u_PAO READ`);
 
-                    let [vendor] =await db_connection.query(`SELECT vendor_ID from Vendor WHERE vendor_Email = ?`, [req.body.userEmail]);
+                    let [vendor] = await db_connection.query(`SELECT vendor_ID from Vendor WHERE vendor_Email = ?`, [req.body.userEmail]);
                     //console.log(id);
 
                     let [procurements] = await db_connection.query(` SELECT p.Procurement_ID, p.GeM_ID, p.Goods_type, p.Goods_quantity, p.Vendor_selection,
@@ -112,7 +112,7 @@ module.exports = {
 
                     await db_connection.query(`UNLOCK TABLES`);
 
-                    if(procurements.length===0){
+                    if (procurements.length === 0) {
                         return res.status(400).send({ "message": "No Procurements found!" });
                     }
 
@@ -132,13 +132,14 @@ module.exports = {
             }
         }
     ],
+
     getMSE: [
         webTokenValidator,
         async (req, res) => {
-            if(req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
-            req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
-            req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" ||
-            (req.authorization_tier!="0" && req.authorization_tier!="1" && req.authorization_tier!="2" && req.authorization_tier!="3" && req.authorization_tier!="4")){
+            if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
+                req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
+                req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" ||
+                (req.authorization_tier != "0" && req.authorization_tier != "1" && req.authorization_tier != "2" && req.authorization_tier != "3" && req.authorization_tier != "4")) {
                 return res.status(400).send({ "message": "Access Restricted!" });
             }
 
@@ -147,20 +148,20 @@ module.exports = {
 
             try {
 
-                
-                    await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ`);
 
-                    let [procurements] = await db_connection.query(` select p.goods_type, p.goods_quantity, v.vendor_Organization
+                await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ`);
+
+                let [procurements] = await db_connection.query(` select p.goods_type, p.goods_quantity, v.vendor_Organization
                     from procurement p left join vendor v on p.vendor_ID = v.vendor_ID
                     where v.mse='1';`);
 
-                    await db_connection.query(`UNLOCK TABLES`);
+                await db_connection.query(`UNLOCK TABLES`);
 
-                    return res.status(200).send({
-                        "message": "All MSE Procurements fetched successfully!",
-                        "procurements": procurements
-                    });
-                
+                return res.status(200).send({
+                    "message": "All MSE Procurements fetched successfully!",
+                    "procurements": procurements
+                });
+
             } catch (err) {
                 console.log(err);
                 const time = new Date();
@@ -175,10 +176,10 @@ module.exports = {
     getWomen: [
         webTokenValidator,
         async (req, res) => {
-            if(req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
-            req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
-            req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" ||
-            (req.authorization_tier!="0" && req.authorization_tier!="1" && req.authorization_tier!="2" && req.authorization_tier!="3" && req.authorization_tier!="4")){
+            if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
+                req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
+                req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" ||
+                (req.authorization_tier != "0" && req.authorization_tier != "1" && req.authorization_tier != "2" && req.authorization_tier != "3" && req.authorization_tier != "4")) {
                 return res.status(400).send({ "message": "Access Restricted!" });
             }
 
@@ -187,20 +188,20 @@ module.exports = {
 
             try {
 
-                
-                    await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ`);
 
-                    let [procurements] = await db_connection.query(` select p.goods_type, p.goods_quantity, v.vendor_Organization
+                await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ`);
+
+                let [procurements] = await db_connection.query(` select p.goods_type, p.goods_quantity, v.vendor_Organization
                     from procurement p left join vendor v on p.vendor_ID = v.vendor_ID
                     where v.women_owned='1';`);
 
-                    await db_connection.query(`UNLOCK TABLES`);
+                await db_connection.query(`UNLOCK TABLES`);
 
-                    return res.status(200).send({
-                        "message": "All Women_Owned Procurements fetched successfully!",
-                        "procurements": procurements
-                    });
-                
+                return res.status(200).send({
+                    "message": "All Women_Owned Procurements fetched successfully!",
+                    "procurements": procurements
+                });
+
             } catch (err) {
                 console.log(err);
                 const time = new Date();
@@ -216,10 +217,10 @@ module.exports = {
     getSCST: [
         webTokenValidator,
         async (req, res) => {
-            if(req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
-            req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
-            req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" ||
-            (req.authorization_tier!="0" && req.authorization_tier!="1" && req.authorization_tier!="2" && req.authorization_tier!="3" && req.authorization_tier!="4")){
+            if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
+                req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
+                req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" ||
+                (req.authorization_tier != "0" && req.authorization_tier != "1" && req.authorization_tier != "2" && req.authorization_tier != "3" && req.authorization_tier != "4")) {
                 return res.status(400).send({ "message": "Access Restricted!" });
             }
 
@@ -228,20 +229,20 @@ module.exports = {
 
             try {
 
-                
-                    await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ`);
 
-                    let [procurements] = await db_connection.query(` select p.goods_type, p.goods_quantity, v.vendor_Organization
+                await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ`);
+
+                let [procurements] = await db_connection.query(` select p.goods_type, p.goods_quantity, v.vendor_Organization
                     from procurement p left join vendor v on p.vendor_ID = v.vendor_ID 
                     where v.sc_st = '1';`);
 
-                    await db_connection.query(`UNLOCK TABLES`);
+                await db_connection.query(`UNLOCK TABLES`);
 
-                    return res.status(200).send({
-                        "message": "All SCST Procurements fetched successfully!",
-                        "procurements": procurements
-                    });
-                
+                return res.status(200).send({
+                    "message": "All SCST Procurements fetched successfully!",
+                    "procurements": procurements
+                });
+
             } catch (err) {
                 console.log(err);
                 const time = new Date();
@@ -253,7 +254,7 @@ module.exports = {
             }
         }
     ],
-    
+
     createProcurement: [
         /*
         JSON
@@ -268,23 +269,23 @@ module.exports = {
         */
         webTokenValidator,
         async (req, res) => {
-            if(req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
-            req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
-            req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" || req.authorization_tier==="2" || req.authorization_tier==="3" || req.authorization_tier==="4" ||            
-            (req.authorization_tier!="0" && req.authorization_tier!="1")){
+            if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
+                req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
+                req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" || req.authorization_tier === "2" || req.authorization_tier === "3" || req.authorization_tier === "4" ||
+                (req.authorization_tier != "0" && req.authorization_tier != "1")) {
                 return res.status(400).send({ "message": "Access Restricted!" });
             }
 
-            if(req.body.GeM_ID === null || req.body.GeM_ID === undefined || req.body.GeM_ID === "" || isNaN(req.body.GeM_ID) ||
-            req.body.Goods_type === null || req.body.Goods_type === undefined || req.body.Goods_type === "" ||
-            req.body.Goods_quantity === null || req.body.Goods_quantity === undefined || req.body.Goods_quantity === "" ||
-            req.body.Vendor_selection === null || req.body.Vendor_selection === undefined || req.body.Vendor_selection === "" ||
-            req.body.Vendor_ID === null || req.body.Vendor_ID === undefined || req.body.Vendor_ID === "" || isNaN(req.body.Vendor_ID) ||
-            req.body.Invoice_No === null || req.body.Invoice_No === undefined || req.body.Invoice_No === ""|| isNaN(req.body.Invoice_No)) {
+            if (req.body.GeM_ID === null || req.body.GeM_ID === undefined || req.body.GeM_ID === "" || isNaN(req.body.GeM_ID) ||
+                req.body.Goods_type === null || req.body.Goods_type === undefined || req.body.Goods_type === "" ||
+                req.body.Goods_quantity === null || req.body.Goods_quantity === undefined || req.body.Goods_quantity === "" ||
+                req.body.Vendor_selection === null || req.body.Vendor_selection === undefined || req.body.Vendor_selection === "" ||
+                req.body.Vendor_ID === null || req.body.Vendor_ID === undefined || req.body.Vendor_ID === "" || isNaN(req.body.Vendor_ID) ||
+                req.body.Invoice_No === null || req.body.Invoice_No === undefined || req.body.Invoice_No === "" || isNaN(req.body.Invoice_No)) {
                 return res.status(400).send({ "message": "Missing details." });
             }
 
-            if(req.body.Vendor_selection!=="bidding" && req.body.Vendor_selection!=="direct-purchase" && req.body.Vendor_selection!=="reverse-auction"){
+            if (req.body.Vendor_selection !== "bidding" && req.body.Vendor_selection !== "direct-purchase" && req.body.Vendor_selection !== "reverse-auction") {
                 return res.status(400).send({ "message": "Invalid Vendor selection!" });
             }
 
@@ -295,23 +296,23 @@ module.exports = {
 
                 let [vendor] = await db_connection.query(`SELECT * from Vendor WHERE vendor_ID = ?`, [req.body.Vendor_ID]);
 
-                if(vendor.length===0){
+                if (vendor.length === 0) {
                     return res.status(400).send({ "message": "Vendor not found!" });
                 }
 
                 let [procurement] = await db_connection.query(`SELECT * from Procurement WHERE GeM_ID = ?`, [req.body.GeM_ID]);
                 let [procurement1] = await db_connection.query(`SELECT * from Procurement WHERE Invoice_No = ?`, [req.body.Invoice_No]);
 
-                if(procurement.length>0 || procurement1.length>0){
-                    return res.status(400).send({"message": "Procurement already exists!"});
+                if (procurement.length > 0 || procurement1.length > 0) {
+                    return res.status(400).send({ "message": "Procurement already exists!" });
                 }
-                await db_connection.query(`INSERT INTO INVOICE (Invoice_No,Invoice_document) VALUES (?,?)`, [req.body.Invoice_No,1]);
-                let [buyer] = await db_connection.query(`Select userID from USER where userEmail = ?`,[req.body.userEmail]);
-                buyer=buyer[0].userID;
-                await db_connection.query(`INSERT into Procurement (GeM_ID, Goods_type, Goods_quantity, Vendor_selection, vendor_ID, Invoice_No, Procurement_status, Procurement_Buyer) values (?, ?, ?, ?, ?, ?, ?, ?)`, [req.body.GeM_ID, req.body.Goods_type, req.body.Goods_quantity, req.body.Vendor_selection, req.body.Vendor_ID, req.body.Invoice_No, "1",buyer]);
+                await db_connection.query(`INSERT INTO INVOICE (Invoice_No,Invoice_document) VALUES (?,?)`, [req.body.Invoice_No, 1]);
+                let [buyer] = await db_connection.query(`Select userID from USER where userEmail = ?`, [req.body.userEmail]);
+                buyer = buyer[0].userID;
+                await db_connection.query(`INSERT into Procurement (GeM_ID, Goods_type, Goods_quantity, Vendor_selection, vendor_ID, Invoice_No, Procurement_status, Procurement_Buyer) values (?, ?, ?, ?, ?, ?, ?, ?)`, [req.body.GeM_ID, req.body.Goods_type, req.body.Goods_quantity, req.body.Vendor_selection, req.body.Vendor_ID, req.body.Invoice_No, "1", buyer]);
                 await db_connection.query(`UNLOCK TABLES`);
 
-                return res.status(400).send({"message": "Procurement created!"});
+                return res.status(400).send({ "message": "Procurement created!" });
 
             } catch (err) {
                 console.log(err);
@@ -333,16 +334,16 @@ module.exports = {
         }
         */
         webTokenValidator,
-        async (req,res) => {
-            if(req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
-            req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
-            req.authorization_tier !== '0'){
+        async (req, res) => {
+            if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
+                req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
+                req.authorization_tier !== '0') {
                 return res.status(400).send({ "message": "Access Restricted!" });
             }
 
             let db_connection = await db.promise().getConnection();
-            
-            try{
+
+            try {
                 await db_connection.query(`LOCK TABLES Procurement WRITE`);
 
                 let [procurement] = await db_connection.query(`DELETE from Procurement WHERE Procurement_ID = ?`, [req.body.Procurement_ID]);
@@ -354,15 +355,15 @@ module.exports = {
 
                 return res.status(400).send({ "message": "Procurement Deleted!" });
 
-            }catch(e){
+            } catch (e) {
                 console.log(err);
                 const time = new Date();
                 fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - deleteProcurement - ${err}\n`);
                 return res.status(500).send({ "message": "Internal Server Error." });
-            }finally{
+            } finally {
                 await db_connection.query(`UNLOCK TABLES`);
                 db_connection.release();
             }
         }
-    ]  
+    ]
 }
