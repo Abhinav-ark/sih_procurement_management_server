@@ -8,3 +8,4 @@
 2023-10-04T08:30:58.331Z - createProcurement - Error: Column count doesn't match value count at row 1
 2023-10-04T08:33:50.978Z - getAllProcurements - Error: Table 'u_buyer' was not locked with LOCK TABLES
 2023-10-25T04:03:26.879Z - createProcurement - Error: Column 'vendorSelection' cannot be null
+2023-10-25T08:17:23.339Z - getVendors - Error: Table 'neepco_procurement_management.vendors' doesn't exist
