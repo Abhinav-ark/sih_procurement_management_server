@@ -82,14 +82,14 @@ module.exports = {
                 if (req.authorization_tier !== "4") {
                     await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ, USER u_Buyer READ, USER u_Consignee READ, USER u_PAO READ`);
 
-                    let [procurements] = await db_connection.query(` select p.procurement_ID, p.GeM_ID, p.goods_type, p.goods_quantity, 
-                    p.vendor_selection, p.vendor_ID, v.vendor_Organization, v.vendor_Email, v.msme, v.women_owned, v.sc_st, p.Invoice_No,
-                    p.PRC_No, p.CRAC_No, p.Payment_Id, p.Procurement_Status as Status, p.Procurement_Buyer as Buyer_ID,
-                    u_Buyer.userName as Buyer, p.Procurement_Consignee as Consignee_ID, u_Consignee.userName as Consignee,
-                    p.Procurement_PAO as Payment_Authority_ID, u_PAO.userName as Payment_Authority
-                    from procurement p left join vendor v on p.vendor_ID = v.vendor_ID LEFT JOIN
-                    user AS u_Buyer ON p.Procurement_Buyer = u_Buyer.userID LEFT JOIN user AS u_Consignee 
-                    ON p.Procurement_Consignee = u_Consignee.userID LEFT JOIN user AS u_PAO ON p.Procurement_PAO = u_PAO.userID;`);
+                    let [procurements] = await db_connection.query(` select p.procurementID, p.gemID, p.goodsType, p.goodsQuantity, 
+                    p.vendorSelection, p.vendorID, v.vendorOrganization, v.vendorEmail, v.msme, v.womenOwned, v.scst, p.invoiceNo,
+                    p.prcNo, p.cracNo, p.paymentId, p.procurementStatus as Status, p.procurementBuyer as Buyer_ID,
+                    u_Buyer.userName as Buyer, p.procurementConsignee as Consignee_ID, u_Consignee.userName as Consignee,
+                    p.procurementPAO as Payment_Authority_ID, u_PAO.userName as Payment_Authority
+                    from procurement p left join vendor v on p.vendorID = v.vendorID LEFT JOIN
+                    user AS u_Buyer ON p.procurementBuyer = u_Buyer.userID LEFT JOIN user AS u_Consignee 
+                    ON p.procurementConsignee = u_Consignee.userID LEFT JOIN user AS u_PAO ON p.procurementPAO = u_PAO.userID;`);
 
                     await db_connection.query(`UNLOCK TABLES`);
 
@@ -100,14 +100,14 @@ module.exports = {
                 } else {
                     await db_connection.query(`LOCK TABLES Procurement READ, Vendor READ, USER u_buyer READ, USER u_Consignee READ, USER u_PAO READ`);
 
-                    let [vendor] = await db_connection.query(`SELECT vendor_ID from Vendor WHERE vendor_Email = ?`, [req.body.userEmail]);
+                    let [vendor] = await db_connection.query(`SELECT vendorID from Vendor WHERE vendorEmail = ?`, [req.body.userEmail]);
                     //console.log(id);
 
-                    let [procurements] = await db_connection.query(` SELECT p.Procurement_ID, p.GeM_ID, p.Goods_type, p.Goods_quantity, p.Vendor_selection,
-                    p.Invoice_No, u_Buyer.userEmail as Buyer, p.PRC_No, p.CRAC_No, u_Consignee.userEmail as Consignee,
-                    p.Payment_ID, u_PAO.userEmail as Payment_Authority, p.Procurement_Status from Procurement p LEFT JOIN USER
-                    AS u_Buyer ON  p.Procurement_Buyer = u_Buyer.userID LEFT JOIN user AS u_Consignee ON p.Procurement_Consignee = u_Consignee.userID
-                    LEFT JOIN user AS u_PAO ON p.Procurement_PAO = u_PAO.userID where p.Vendor_ID = ?;`, [vendor[0].vendor_ID]);
+                    let [procurements] = await db_connection.query(` SELECT p.procurementID, p.gemID, p.goodsType, p.goodsQuantity, p.vendorSelection,
+                    p.invoiceNo, u_Buyer.userEmail as Buyer, p.prcNo, p.cracNo, u_Consignee.userEmail as Consignee,
+                    p.paymentID, u_PAO.userEmail as Payment_Authority, p.procurementStatus from Procurement p LEFT JOIN USER
+                    AS u_Buyer ON  p.procurementBuyer = u_Buyer.userID LEFT JOIN user AS u_Consignee ON p.procurementConsignee = u_Consignee.userID
+                    LEFT JOIN user AS u_PAO ON p.procurementPAO = u_PAO.userID where p.vendorID = ?;`, [vendor[0].vendor_ID]);
                     //console.log(procurements);
 
                     await db_connection.query(`UNLOCK TABLES`);
@@ -133,7 +133,7 @@ module.exports = {
         }
     ],
 
-    getMSE: [
+    getMSME: [
         webTokenValidator,
         async (req, res) => {
             if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
@@ -151,21 +151,21 @@ module.exports = {
 
                 await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ`);
 
-                let [procurements] = await db_connection.query(` select p.goods_type, p.goods_quantity, v.vendor_Organization
-                    from procurement p left join vendor v on p.vendor_ID = v.vendor_ID
-                    where v.mse='1';`);
+                let [procurements] = await db_connection.query(` select p.goodsType, p.goodsQuantity, v.vendorOrganization
+                    from procurement p left join vendor v on p.vendorID = v.vendorID
+                    where v.msme='1';`);
 
                 await db_connection.query(`UNLOCK TABLES`);
 
                 return res.status(200).send({
-                    "message": "All MSE Procurements fetched successfully!",
+                    "message": "All MSME Procurements fetched successfully!",
                     "procurements": procurements
                 });
 
             } catch (err) {
                 console.log(err);
                 const time = new Date();
-                fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - getmse - ${err}\n`);
+                fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - getmsme - ${err}\n`);
                 return res.status(500).send({ "message": "Internal Server Error." });
             } finally {
                 await db_connection.query(`UNLOCK TABLES`);
@@ -191,21 +191,21 @@ module.exports = {
 
                 await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ`);
 
-                let [procurements] = await db_connection.query(` select p.goods_type, p.goods_quantity, v.vendor_Organization
-                    from procurement p left join vendor v on p.vendor_ID = v.vendor_ID
-                    where v.women_owned='1';`);
+                let [procurements] = await db_connection.query(` select p.goodsType, p.goodsQuantity, v.vendorOrganization
+                    from procurement p left join vendor v on p.vendorID = v.vendorID
+                    where v.womenOwned='1';`);
 
                 await db_connection.query(`UNLOCK TABLES`);
 
                 return res.status(200).send({
-                    "message": "All Women_Owned Procurements fetched successfully!",
+                    "message": "All Women Owned Procurements fetched successfully!",
                     "procurements": procurements
                 });
 
             } catch (err) {
                 console.log(err);
                 const time = new Date();
-                fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - getmse - ${err}\n`);
+                fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - getwomen - ${err}\n`);
                 return res.status(500).send({ "message": "Internal Server Error." });
             } finally {
                 await db_connection.query(`UNLOCK TABLES`);
@@ -232,9 +232,9 @@ module.exports = {
 
                 await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ`);
 
-                let [procurements] = await db_connection.query(` select p.goods_type, p.goods_quantity, v.vendor_Organization
-                    from procurement p left join vendor v on p.vendor_ID = v.vendor_ID 
-                    where v.sc_st = '1';`);
+                let [procurements] = await db_connection.query(` select p.goodsType, p.goodsQuantity, v.vendorOrganization
+                    from procurement p left join vendor v on p.vendorID = v.vendorID 
+                    where v.scst = '1';`);
 
                 await db_connection.query(`UNLOCK TABLES`);
 
@@ -246,7 +246,7 @@ module.exports = {
             } catch (err) {
                 console.log(err);
                 const time = new Date();
-                fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - getmse - ${err}\n`);
+                fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - getscst - ${err}\n`);
                 return res.status(500).send({ "message": "Internal Server Error." });
             } finally {
                 await db_connection.query(`UNLOCK TABLES`);
@@ -276,16 +276,16 @@ module.exports = {
                 return res.status(400).send({ "message": "Access Restricted!" });
             }
 
-            if (req.body.GeM_ID === null || req.body.GeM_ID === undefined || req.body.GeM_ID === "" || isNaN(req.body.GeM_ID) ||
-                req.body.Goods_type === null || req.body.Goods_type === undefined || req.body.Goods_type === "" ||
-                req.body.Goods_quantity === null || req.body.Goods_quantity === undefined || req.body.Goods_quantity === "" ||
-                req.body.Vendor_selection === null || req.body.Vendor_selection === undefined || req.body.Vendor_selection === "" ||
-                req.body.Vendor_ID === null || req.body.Vendor_ID === undefined || req.body.Vendor_ID === "" || isNaN(req.body.Vendor_ID) ||
-                req.body.Invoice_No === null || req.body.Invoice_No === undefined || req.body.Invoice_No === "" || isNaN(req.body.Invoice_No)) {
+            if (req.body.gemID === null || req.body.gemID === undefined || req.body.gemID === "" || isNaN(req.body.gemID) ||
+                req.body.goodsType === null || req.body.goodsType === undefined || req.body.goodsType === "" ||
+                req.body.goodsQuantity === null || req.body.goodsQuantity === undefined || req.body.goodsQuantity === "" ||
+                req.body.vendorSelection === null || req.body.vendorSelection === undefined || req.body.vendorSelection === "" ||
+                req.body.vendorID === null || req.body.vendorID === undefined || req.body.vendorID === "" || isNaN(req.body.vendorID) ||
+                req.body.invoiceNo === null || req.body.invoiceNo === undefined || req.body.invoiceNo === "" || isNaN(req.body.invoiceNo)) {
                 return res.status(400).send({ "message": "Missing details." });
             }
 
-            if (req.body.Vendor_selection !== "bidding" && req.body.Vendor_selection !== "direct-purchase" && req.body.Vendor_selection !== "reverse-auction") {
+            if (req.body.vendorSelection !== "bidding" && req.body.vendorSelection !== "direct-purchase" && req.body.vendorSelection !== "reverse-auction") {
                 return res.status(400).send({ "message": "Invalid Vendor selection!" });
             }
 
@@ -294,22 +294,22 @@ module.exports = {
             try {
                 await db_connection.query(`LOCK TABLES Vendor READ, Procurement WRITE, INVOICE WRITE, USER READ`);
 
-                let [vendor] = await db_connection.query(`SELECT * from Vendor WHERE vendor_ID = ?`, [req.body.Vendor_ID]);
+                let [vendor] = await db_connection.query(`SELECT * from Vendor WHERE vendorID = ?`, [req.body.vendorID]);
 
                 if (vendor.length === 0) {
                     return res.status(400).send({ "message": "Vendor not found!" });
                 }
 
-                let [procurement] = await db_connection.query(`SELECT * from Procurement WHERE GeM_ID = ?`, [req.body.GeM_ID]);
-                let [procurement1] = await db_connection.query(`SELECT * from Procurement WHERE Invoice_No = ?`, [req.body.Invoice_No]);
+                let [procurement] = await db_connection.query(`SELECT * from Procurement WHERE gemID = ?`, [req.body.gemID]);
+                let [procurement1] = await db_connection.query(`SELECT * from Procurement WHERE invoiceNo = ?`, [req.body.invoiceNo]);
 
                 if (procurement.length > 0 || procurement1.length > 0) {
                     return res.status(400).send({ "message": "Procurement already exists!" });
                 }
-                await db_connection.query(`INSERT INTO INVOICE (Invoice_No,Invoice_document) VALUES (?,?)`, [req.body.Invoice_No, 1]);
+                await db_connection.query(`INSERT INTO INVOICE (invoiceNo,invoiceDocument) VALUES (?,?)`, [req.body.invoiceNo, "test_doc"]);
                 let [buyer] = await db_connection.query(`Select userID from USER where userEmail = ?`, [req.body.userEmail]);
                 buyer = buyer[0].userID;
-                await db_connection.query(`INSERT into Procurement (GeM_ID, Goods_type, Goods_quantity, Vendor_selection, vendor_ID, Invoice_No, Procurement_status, Procurement_Buyer) values (?, ?, ?, ?, ?, ?, ?, ?)`, [req.body.GeM_ID, req.body.Goods_type, req.body.Goods_quantity, req.body.Vendor_selection, req.body.Vendor_ID, req.body.Invoice_No, "1", buyer]);
+                await db_connection.query(`INSERT into Procurement (gemID, goodsType, goodsQuantity, vendorSelection, vendorID, invoiceNo, procurementStatus, procurementBuyer) values (?, ?, ?, ?, ?, ?, ?, ?)`, [req.body.gemID, req.body.goodsType, req.body.goodsQuantity, req.body.vendorSelection, req.body.vendorID, req.body.invoiceNo, "1", buyer]);
                 await db_connection.query(`UNLOCK TABLES`);
 
                 return res.status(400).send({ "message": "Procurement created!" });
@@ -346,11 +346,11 @@ module.exports = {
             try {
                 await db_connection.query(`LOCK TABLES Procurement WRITE`);
 
-                let [procurement] = await db_connection.query(`DELETE from Procurement WHERE Procurement_ID = ?`, [req.body.Procurement_ID]);
+                let [procurement] = await db_connection.query(`DELETE from Procurement WHERE procurementID = ?`, [req.body.procurementID]);
 
                 if (procurement.affectedRows === 0) {
                     await db_connection.query(`UNLOCK TABLES`);
-                    return res.status(400).send({ "message": "Invalid Procurement_ID!" });
+                    return res.status(400).send({ "message": "Invalid Procurement ID!" });
                 }
 
                 return res.status(400).send({ "message": "Procurement Deleted!" });

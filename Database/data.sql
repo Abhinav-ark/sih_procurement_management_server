@@ -22,96 +22,96 @@ CREATE TABLE USER (
   )
 );
 CREATE TABLE Invoice (
-  Invoice_No INT NOT NULL,
-  Invoice_document INT NOT NULL,
-  PRIMARY KEY (Invoice_No)
+  invoiceNo INT NOT NULL,
+  invoiceDocument varchar(255) NOT NULL,
+  PRIMARY KEY (invoiceNo)
 );
 CREATE TABLE Payment (
-  Payment_ID INT NOT NULL AUTO_INCREMENT,
-  Payment_amount FLOAT NOT NULL,
-  Payment_mode VARCHAR(20) NOT NULL,
-  Transaction_ID INT NOT NULL,
-  PRIMARY KEY (Payment_ID),
-  UNIQUE (Transaction_ID),
+  paymentID INT NOT NULL AUTO_INCREMENT,
+  paymentAmount FLOAT NOT NULL,
+  paymentMode VARCHAR(20) NOT NULL,
+  transactionID INT NOT NULL,
+  PRIMARY KEY (paymentID),
+  UNIQUE (transactionID),
   CHECK (
-    Payment_mode = 'Internet Banking'
-    OR Payment_mode = 'NEFT'
-    OR Payment_mode = 'IMPS'
-    OR Payment_mode = 'RTGS'
+    paymentMode = 'Internet Banking'
+    OR paymentMode = 'NEFT'
+    OR paymentMode = 'IMPS'
+    OR paymentMode = 'RTGS'
   )
 );
 CREATE TABLE PRC (
-  PRC_No INT NOT NULL AUTO_INCREMENT,
-  PRC_Date DATE NOT NULL,
-  PRIMARY KEY (PRC_No)
+  prcNo INT NOT NULL AUTO_INCREMENT,
+  prcDate DATE NOT NULL,
+  PRIMARY KEY (prcNo)
 );
 CREATE TABLE CRAC (
-  CRAC_No INT NOT NULL AUTO_INCREMENT,
-  CRAC_Date DATE NOT NULL,
-  PRIMARY KEY (CRAC_No)
+  cracNo INT NOT NULL AUTO_INCREMENT,
+  cracDate DATE NOT NULL,
+  PRIMARY KEY (cracNo)
 );
 CREATE TABLE Vendor (
-  Vendor_ID INT NOT NULL AUTO_INCREMENT,
-  Vendor_Organization VARCHAR(255) NOT NULL,
-  Vendor_Email VARCHAR(255) NOT NULL,
+  vendorID INT NOT NULL AUTO_INCREMENT,
+  vendorOrganization VARCHAR(255) NOT NULL,
+  vendorEmail VARCHAR(255) NOT NULL,
   MSME CHAR(1) NOT NULL,
-  Women_Owned CHAR(1) NOT NULL,
-  SC_ST CHAR(1) NOT NULL,
-  PRIMARY KEY (Vendor_ID),
-  UNIQUE (Vendor_Email),
+  womenOwned CHAR(1) NOT NULL,
+  SCST CHAR(1) NOT NULL,
+  PRIMARY KEY (vendorID),
+  UNIQUE (vendorEmail),
   CHECK (
     MSME = '0'
     or MSME = '1'
   ),
   CHECK (
-    Women_Owned = '0'
-    or Women_Owned = '1'
+    womenOwned = '0'
+    or womenOwned = '1'
   ),
   CHECK (
-    SC_St = '0'
-    or SC_ST = '1'
+    SCST = '0'
+    or SCST = '1'
   )
 );
 CREATE TABLE Procurement (
-  Procurement_ID INT NOT NULL AUTO_INCREMENT,
-  GeM_ID INT NOT NULL,
-  goods_type VARCHAR(20) NOT NULL,
-  goods_quantity VARCHAR(20) NOT NULL,
-  vendor_selection VARCHAR(20) NOT NULL,
-  Vendor_ID INT NOT NULL,
-  Invoice_No INT NULL,
-  PRC_No INT NULL,
-  CRAC_No INT NULL,
-  Payment_ID INT NULL,
-  Procurement_Status CHAR(1) NOT NULL DEFAULT "0",
-  Procurement_Buyer INT NULL,
-  Procurement_Consignee INT NULL,
-  Procurement_PAO INT NULL,
-  PRIMARY KEY (Procurement_ID),
-  FOREIGN KEY (Invoice_No) REFERENCES Invoice(Invoice_No),
-  FOREIGN KEY (Payment_ID) REFERENCES Payment(Payment_ID),
-  FOREIGN KEY (PRC_No) REFERENCES PRC(PRC_No),
-  FOREIGN KEY (CRAC_No) REFERENCES CRAC(CRAC_No),
-  FOREIGN KEY (Vendor_ID) REFERENCES Vendor(Vendor_ID),
-  FOREIGN KEY (Procurement_Buyer) REFERENCES USER(userID),
-  FOREIGN KEY (Procurement_Consignee) REFERENCES USER(userID),
-  FOREIGN KEY (Procurement_PAO) REFERENCES USER(userID),
-  UNIQUE (GeM_ID),
-  UNIQUE (Invoice_No),
-  UNIQUE (Payment_ID),
-  UNIQUE (PRC_No),
-  UNIQUE (CRAC_No),
+  procurementID INT NOT NULL AUTO_INCREMENT,
+  gemID INT NOT NULL,
+  goodsType VARCHAR(20) NOT NULL,
+  goodsQuantity VARCHAR(20) NOT NULL,
+  vendorSelection VARCHAR(20) NOT NULL,
+  vendorID INT NOT NULL,
+  invoiceNo INT NULL,
+  prcNo INT NULL,
+  cracNo INT NULL,
+  paymentID INT NULL,
+  procurementStatus CHAR(1) NOT NULL DEFAULT "0",
+  procurementBuyer INT NULL,
+  procurementConsignee INT NULL,
+  procurementPAO INT NULL,
+  PRIMARY KEY (procurementID),
+  FOREIGN KEY (invoiceNo) REFERENCES Invoice(invoiceNo),
+  FOREIGN KEY (paymentID) REFERENCES Payment(paymentID),
+  FOREIGN KEY (prcNo) REFERENCES PRC(prcNo),
+  FOREIGN KEY (cracNo) REFERENCES CRAC(cracNo),
+  FOREIGN KEY (vendorID) REFERENCES Vendor(vendorID),
+  FOREIGN KEY (procurementBuyer) REFERENCES USER(userID),
+  FOREIGN KEY (procurementConsignee) REFERENCES USER(userID),
+  FOREIGN KEY (procurementPAO) REFERENCES USER(userID),
+  UNIQUE (gemID),
+  UNIQUE (invoiceNo),
+  UNIQUE (paymentID),
+  UNIQUE (prcNo),
+  UNIQUE (cracNo),
   CHECK (
-    vendor_selection = 'bidding'
-    or vendor_selection = 'direct-purchase'
-    or vendor_selection = 'reverse-auction'
+    vendorSelection = 'bidding'
+    or vendorSelection = 'direct-purchase'
+    or vendorSelection = 'reverse-auction'
   ),
   CHECK (
-    Procurement_Status = "0"
-    or Procurement_Status = "1"
-    or Procurement_Status = "2"
-    or Procurement_Status = "3"
-    or Procurement_Status = "4"
+    procurementStatus = "0"
+    or procurementStatus = "1"
+    or procurementStatus = "2"
+    or procurementStatus = "3"
+    or procurementStatus = "4"
   )
 );
 INSERT INTO USER (userEmail, userName, userRole, userPassword)
@@ -134,52 +134,52 @@ INSERT INTO USER (userEmail, userName, userRole, userPassword)
 VALUES ('sajith@gmail.com', 'Sajith', '3', 'sajith123456');
 INSERT INTO USER (userEmail, userName, userRole, userPassword)
 VALUES ('vakada@gmail.com', 'Vakada', '4', 'vakada123456');
-INSERT INTO INVOICE (INVOICE_NO, INVOICE_DOCUMENT)
-VALUES (923, 1);
-INSERT INTO INVOICE (INVOICE_NO, INVOICE_DOCUMENT)
-VALUES (934, 1);
-INSERT INTO INVOICE (INVOICE_NO, INVOICE_DOCUMENT)
-VALUES (1051, 1);
-INSERT INTO INVOICE (INVOICE_NO, INVOICE_DOCUMENT)
-VALUES (1227, 1);
-INSERT INTO INVOICE (INVOICE_NO, INVOICE_DOCUMENT)
-VALUES (7273, 1);
-INSERT INTO PAYMENT (PAYMENT_AMOUNT, PAYMENT_MODE, TRANSACTION_ID)
+INSERT INTO INVOICE (invoiceNo, invoiceDocument)
+VALUES (923, "C:\\invoice\\923.pdf");
+INSERT INTO INVOICE (invoiceNo, invoiceDocument)
+VALUES (934, "C:\\invoice\\934.pdf");
+INSERT INTO INVOICE (invoiceNo, invoiceDocument)
+VALUES (1051, "C:\\invoice\\1051.pdf");
+INSERT INTO INVOICE (invoiceNo, invoiceDocument)
+VALUES (1227, "C:\\invoice\\1227.pdf");
+INSERT INTO INVOICE (invoiceNo, invoiceDocument)
+VALUES (7273, "C:\\invoice\\7273.pdf");
+INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
 VALUES (20000.00, 'Internet Banking', 7894);
-INSERT INTO PAYMENT (PAYMENT_AMOUNT, PAYMENT_MODE, TRANSACTION_ID)
+INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
 VALUES (25000.00, 'NEFT', 9396);
-INSERT INTO PAYMENT (PAYMENT_AMOUNT, PAYMENT_MODE, TRANSACTION_ID)
+INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
 VALUES (45000.00, 'IMPS', 8391);
-INSERT INTO PAYMENT (PAYMENT_AMOUNT, PAYMENT_MODE, TRANSACTION_ID)
+INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
 VALUES (30000.00, 'RTGS', 6653);
-INSERT INTO PAYMENT (PAYMENT_AMOUNT, PAYMENT_MODE, TRANSACTION_ID)
+INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
 VALUES (70000.00, 'NEFT', 1252);
-INSERT INTO CRAC (CRAC_Date)
+INSERT INTO CRAC (cracDate)
 VALUES ('2023-07-20');
-INSERT INTO CRAC (CRAC_Date)
+INSERT INTO CRAC (cracDate)
 VALUES ('2023-08-07');
-INSERT INTO CRAC (CRAC_Date)
+INSERT INTO CRAC (cracDate)
 VALUES ('2023-06-10');
-INSERT INTO CRAC (CRAC_Date)
+INSERT INTO CRAC (cracDate)
 VALUES ('2023-05-14');
-INSERT INTO CRAC (CRAC_Date)
+INSERT INTO CRAC (cracDate)
 VALUES ('2023-05-01');
-INSERT INTO PRC (PRC_Date)
+INSERT INTO PRC (prcDate)
 VALUES ('2023-07-15');
-INSERT INTO PRC (PRC_Date)
+INSERT INTO PRC (prcDate)
 VALUES ('2023-08-02');
-INSERT INTO PRC (PRC_Date)
+INSERT INTO PRC (prcDate)
 VALUES ('2023-06-05');
-INSERT INTO PRC (PRC_Date)
+INSERT INTO PRC (prcDate)
 VALUES ('2023-05-09');
-INSERT INTO PRC (PRC_Date)
+INSERT INTO PRC (prcDate)
 VALUES ('2023-04-28');
 INSERT INTO VENDOR (
-    Vendor_Organization,
-    Vendor_Email,
+    vendorOrganization,
+    vendorEmail,
     MSME,
-    Women_Owned,
-    SC_ST
+    womenOwned,
+    SCST
   )
 VALUES (
     'Sajith Enterprises',
@@ -189,11 +189,11 @@ VALUES (
     '0'
   );
 INSERT INTO VENDOR (
-    Vendor_Organization,
-    Vendor_Email,
+    vendorOrganization,
+    vendorEmail,
     MSME,
-    Women_Owned,
-    SC_ST
+    womenOwned,
+    SCST
   )
 VALUES (
     'Praveen and co.',
@@ -203,11 +203,11 @@ VALUES (
     '0'
   );
 INSERT INTO VENDOR (
-    Vendor_Organization,
-    Vendor_Email,
+    vendorOrganization,
+    vendorEmail,
     MSME,
-    Women_Owned,
-    SC_ST
+    womenOwned,
+    SCST
   )
 VALUES (
     'The Paambu Company',
@@ -217,35 +217,35 @@ VALUES (
     '0'
   );
 INSERT INTO VENDOR (
-    Vendor_Organization,
-    Vendor_Email,
+    vendorOrganization,
+    vendorEmail,
     MSME,
-    Women_Owned,
-    SC_ST
+    womenOwned,
+    SCST
   )
 VALUES ('Thatha Corp.', 'saravana@gmail.com', '0', '0', '0');
 INSERT INTO VENDOR (
-    Vendor_Organization,
-    Vendor_Email,
+    vendorOrganization,
+    vendorEmail,
     MSME,
-    Women_Owned,
-    SC_ST
+    womenOwned,
+    SCST
   )
 VALUES ('David and Sons', 'david@gmail.com', '0', '0', '1');
 INSERT INTO PROCUREMENT (
-    GeM_ID,
-    goods_type,
-    goods_quantity,
-    vendor_selection,
-    vendor_ID,
-    Invoice_No,
-    PRC_No,
-    CRAC_No,
-    Payment_ID,
-    Procurement_Status,
-    Procurement_Buyer,
-    Procurement_Consignee,
-    Procurement_PAO
+    gemID,
+    goodsType,
+    goodsQuantity,
+    vendorSelection,
+    vendorID,
+    invoiceNo,
+    prcNo,
+    cracNo,
+    paymentID,
+    procurementStatus,
+    procurementBuyer,
+    procurementConsignee,
+    procurementPAO
   )
 VALUES(
     14554,
@@ -263,19 +263,19 @@ VALUES(
     4
   );
 INSERT INTO PROCUREMENT (
-    GeM_ID,
-    goods_type,
-    goods_quantity,
-    vendor_selection,
-    vendor_ID,
-    Invoice_No,
-    PRC_No,
-    CRAC_No,
-    Payment_ID,
-    Procurement_Status,
-    Procurement_Buyer,
-    Procurement_Consignee,
-    Procurement_PAO
+    gemID,
+    goodsType,
+    goodsQuantity,
+    vendorSelection,
+    vendorID,
+    invoiceNo,
+    prcNo,
+    cracNo,
+    paymentID,
+    procurementStatus,
+    procurementBuyer,
+    procurementConsignee,
+    procurementPAO
   )
 VALUES(
     13454,
@@ -293,19 +293,19 @@ VALUES(
     4
   );
 INSERT INTO PROCUREMENT (
-    GeM_ID,
-    goods_type,
-    goods_quantity,
-    vendor_selection,
-    vendor_ID,
-    Invoice_No,
-    PRC_No,
-    CRAC_No,
-    Payment_ID,
-    Procurement_Status,
-    Procurement_Buyer,
-    Procurement_Consignee,
-    Procurement_PAO
+    gemID,
+    goodsType,
+    goodsQuantity,
+    vendorSelection,
+    vendorID,
+    invoiceNo,
+    prcNo,
+    cracNo,
+    paymentID,
+    procurementStatus,
+    procurementBuyer,
+    procurementConsignee,
+    procurementPAO
   )
 VALUES(
     13354,
@@ -323,19 +323,19 @@ VALUES(
     4
   );
 INSERT INTO PROCUREMENT(
-    GeM_ID,
-    goods_type,
-    goods_quantity,
-    vendor_selection,
-    vendor_ID,
-    Invoice_No,
-    PRC_No,
-    CRAC_No,
-    Payment_ID,
-    Procurement_Status,
-    Procurement_Buyer,
-    Procurement_Consignee,
-    Procurement_PAO
+    gemID,
+    goodsType,
+    goodsQuantity,
+    vendorSelection,
+    vendorID,
+    invoiceNo,
+    prcNo,
+    cracNo,
+    paymentID,
+    procurementStatus,
+    procurementBuyer,
+    procurementConsignee,
+    procurementPAO
   )
 VALUES(
     16254,
@@ -353,19 +353,19 @@ VALUES(
     4
   );
 INSERT INTO PROCUREMENT(
-    GeM_ID,
-    goods_type,
-    goods_quantity,
-    vendor_selection,
-    vendor_ID,
-    Invoice_No,
-    PRC_No,
-    CRAC_No,
-    Payment_ID,
-    Procurement_Status,
-    Procurement_Buyer,
-    Procurement_Consignee,
-    Procurement_PAO
+    gemID,
+    goodsType,
+    goodsQuantity,
+    vendorSelection,
+    vendorID,
+    invoiceNo,
+    prcNo,
+    cracNo,
+    paymentID,
+    procurementStatus,
+    procurementBuyer,
+    procurementConsignee,
+    procurementPAO
   )
 VALUES(
     17854,
