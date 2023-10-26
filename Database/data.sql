@@ -38,6 +38,7 @@ CREATE TABLE Payment (
     OR paymentMode = 'NEFT'
     OR paymentMode = 'IMPS'
     OR paymentMode = 'RTGS'
+    OR paymentMode = 'Other'
   )
 );
 CREATE TABLE PRC (
@@ -107,11 +108,11 @@ CREATE TABLE Procurement (
     or vendorSelection = 'reverse-auction'
   ),
   CHECK (
-    procurementStatus = "0"
-    or procurementStatus = "1"
-    or procurementStatus = "2"
-    or procurementStatus = "3"
-    or procurementStatus = "4"
+    procurementStatus = "0"     -- 0 - Waiting for PRC
+    or procurementStatus = "1"  -- 1 - Waiting for CRAC || PRC Done
+    or procurementStatus = "2"  -- 2 - Waiting for Payment || CRAC Done
+    or procurementStatus = "3"  -- 3 - Completed || Payment Done
+    or procurementStatus = "4"  -- 4 - Cancelled
   )
 );
 INSERT INTO USER (userEmail, userName, userRole, userPassword)
@@ -129,7 +130,7 @@ VALUES (
     'venky123'
   );
 INSERT INTO USER (userEmail, userName, userRole, userPassword)
-VALUES ('ash@gmail.com', 'Ashwin', '2', 'ash123456');
+VALUES ('ash@gmail.com', 'Ashwin', '0', 'ash123456');
 INSERT INTO USER (userEmail, userName, userRole, userPassword)
 VALUES ('sajith@gmail.com', 'Sajith', '3', 'sajith123456');
 INSERT INTO USER (userEmail, userName, userRole, userPassword)

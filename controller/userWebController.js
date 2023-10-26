@@ -133,128 +133,6 @@ module.exports = {
         }
     ],
 
-    getMSME: [
-        webTokenValidator,
-        async (req, res) => {
-            if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
-                req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
-                req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" ||
-                (req.authorization_tier != "0" && req.authorization_tier != "1" && req.authorization_tier != "2" && req.authorization_tier != "3" && req.authorization_tier != "4")) {
-                return res.status(400).send({ "message": "Access Restricted!" });
-            }
-
-            let db_connection = await db.promise().getConnection();
-
-
-            try {
-
-
-                await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ`);
-
-                let [procurements] = await db_connection.query(` select p.goodsType, p.goodsQuantity, v.vendorOrganization
-                    from procurement p left join vendor v on p.vendorID = v.vendorID
-                    where v.msme='1';`);
-
-                await db_connection.query(`UNLOCK TABLES`);
-
-                return res.status(200).send({
-                    "message": "All MSME Procurements fetched successfully!",
-                    "procurements": procurements
-                });
-
-            } catch (err) {
-                console.log(err);
-                const time = new Date();
-                fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - getmsme - ${err}\n`);
-                return res.status(500).send({ "message": "Internal Server Error." });
-            } finally {
-                await db_connection.query(`UNLOCK TABLES`);
-                db_connection.release();
-            }
-        }
-    ],
-    getWomen: [
-        webTokenValidator,
-        async (req, res) => {
-            if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
-                req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
-                req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" ||
-                (req.authorization_tier != "0" && req.authorization_tier != "1" && req.authorization_tier != "2" && req.authorization_tier != "3" && req.authorization_tier != "4")) {
-                return res.status(400).send({ "message": "Access Restricted!" });
-            }
-
-            let db_connection = await db.promise().getConnection();
-
-
-            try {
-
-
-                await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ`);
-
-                let [procurements] = await db_connection.query(` select p.goodsType, p.goodsQuantity, v.vendorOrganization
-                    from procurement p left join vendor v on p.vendorID = v.vendorID
-                    where v.womenOwned='1';`);
-
-                await db_connection.query(`UNLOCK TABLES`);
-
-                return res.status(200).send({
-                    "message": "All Women Owned Procurements fetched successfully!",
-                    "procurements": procurements
-                });
-
-            } catch (err) {
-                console.log(err);
-                const time = new Date();
-                fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - getwomen - ${err}\n`);
-                return res.status(500).send({ "message": "Internal Server Error." });
-            } finally {
-                await db_connection.query(`UNLOCK TABLES`);
-                db_connection.release();
-            }
-        }
-    ],
-
-    getSCST: [
-        webTokenValidator,
-        async (req, res) => {
-            if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
-                req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
-                req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" ||
-                (req.authorization_tier != "0" && req.authorization_tier != "1" && req.authorization_tier != "2" && req.authorization_tier != "3" && req.authorization_tier != "4")) {
-                return res.status(400).send({ "message": "Access Restricted!" });
-            }
-
-            let db_connection = await db.promise().getConnection();
-
-
-            try {
-
-
-                await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ`);
-
-                let [procurements] = await db_connection.query(` select p.goodsType, p.goodsQuantity, v.vendorOrganization
-                    from procurement p left join vendor v on p.vendorID = v.vendorID 
-                    where v.scst = '1';`);
-
-                await db_connection.query(`UNLOCK TABLES`);
-
-                return res.status(200).send({
-                    "message": "All SCST Procurements fetched successfully!",
-                    "procurements": procurements
-                });
-
-            } catch (err) {
-                console.log(err);
-                const time = new Date();
-                fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - getscst - ${err}\n`);
-                return res.status(500).send({ "message": "Internal Server Error." });
-            } finally {
-                await db_connection.query(`UNLOCK TABLES`);
-                db_connection.release();
-            }
-        }
-    ],
-
     createProcurement: [
         /*
         JSON
@@ -276,12 +154,12 @@ module.exports = {
                 return res.status(400).send({ "message": "Access Restricted!" });
             }
 
-            if (req.body.gemID === null || req.body.gemID === undefined || req.body.gemID === "" || isNaN(req.body.gemID) ||
+            if (req.body.gemID === null || req.body.gemID === undefined || req.body.gemID === "" ||
                 req.body.goodsType === null || req.body.goodsType === undefined || req.body.goodsType === "" ||
                 req.body.goodsQuantity === null || req.body.goodsQuantity === undefined || req.body.goodsQuantity === "" ||
                 req.body.vendorSelection === null || req.body.vendorSelection === undefined || req.body.vendorSelection === "" ||
                 req.body.vendorID === null || req.body.vendorID === undefined || req.body.vendorID === "" || isNaN(req.body.vendorID) ||
-                req.body.invoiceNo === null || req.body.invoiceNo === undefined || req.body.invoiceNo === "" || isNaN(req.body.invoiceNo)) {
+                req.body.invoiceNo === null || req.body.invoiceNo === undefined || req.body.invoiceNo === "") {
                 return res.status(400).send({ "message": "Missing details." });
             }
 
@@ -312,7 +190,7 @@ module.exports = {
                 await db_connection.query(`INSERT into Procurement (gemID, goodsType, goodsQuantity, vendorSelection, vendorID, invoiceNo, procurementStatus, procurementBuyer) values (?, ?, ?, ?, ?, ?, ?, ?)`, [req.body.gemID, req.body.goodsType, req.body.goodsQuantity, req.body.vendorSelection, req.body.vendorID, req.body.invoiceNo, "1", buyer]);
                 await db_connection.query(`UNLOCK TABLES`);
 
-                return res.status(400).send({ "message": "Procurement created!" });
+                return res.status(200).send({ "message": "Procurement created!" });
 
             } catch (err) {
                 console.log(err);
@@ -367,9 +245,9 @@ module.exports = {
         }
     ],
 
-    getVendors: [   
+    getVendors: [
         webTokenValidator,
-        async (req, res) => {  
+        async (req, res) => {
             if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
                 req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
                 req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" || req.authorization_tier === "2" || req.authorization_tier === "3" || req.authorization_tier === "4" ||
@@ -379,31 +257,341 @@ module.exports = {
 
             let db_connection = await db.promise().getConnection();
 
-            try{
+            try {
                 await db_connection.query(`LOCK TABLES Vendor READ`);
 
-                let [Vendors] = await db_connection.query(`Select vendorID,vendorOrganization from Vendor`);
+                let [Vendors] = await db_connection.query(`Select * from Vendor`);
 
                 if (Vendors.length === 0) {
-                    return res.status(400).send({ "message": "No Vendors found!" });
+                    return res.status(200).send({ "message": "No Vendors found!", "Vendors": [] });
                 }
 
-                return res.status(400).send(
-                { 
-                    "message": "Vendors Fetched Successfully!",
-                    "Vendors": Vendors
+                Vendors = Vendors.map((vendor) => {
+                    return {
+                        "vendorID": vendor.vendorID,
+                        "vendorName": vendor.vendorOrganization + (vendor.msme === "1" ? " | MSME" : "") + (vendor.womenOwned === "1" ? " | Women Owned" : "") + (vendor.scst === "1" ? " | SCST" : "")
+                    }
                 });
 
-            }catch(err){
+                return res.status(200).send(
+                    {
+                        "message": "Vendors Fetched Successfully!",
+                        "Vendors": Vendors
+                    });
+
+            } catch (err) {
                 console.log(err);
                 const time = new Date();
                 fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - getVendors - ${err}\n`);
                 return res.status(500).send({ "message": "Internal Server Error." });
-            }finally{
+            } finally {
                 await db_connection.query(`UNLOCK TABLES`);
                 db_connection.release();
             }
-            
+
         }
-    ]
+    ],
+
+
+    uploadPRC: [
+        webTokenValidator,
+        async (req, res) => {
+            if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
+                req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
+                req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" ||
+                (req.authorization_tier != "0" && req.authorization_tier != "2")) {
+                return res.status(400).send({ "message": "Access Restricted!" });
+            }
+
+            if (req.body.procurementID === null || req.body.procurementID === undefined || req.body.procurementID === "" || isNaN(req.body.procurementID)) {
+                return res.status(400).send({ "message": "Missing details." });
+            }
+
+            let db_connection = await db.promise().getConnection();
+
+            try {
+                // check if user exists and is 0 or 2
+                await db_connection.query(`LOCK TABLES USER READ`);
+
+                let [user] = await db_connection.query(`SELECT * from USER WHERE userEmail = ? AND userRole = ?`, [req.body.userEmail, req.authorization_tier]);
+
+                if (user.length === 0) {
+                    await db_connection.query(`UNLOCK TABLES`);
+                    return res.status(400).send({ "message": "User not found!" });
+                }
+
+                await db_connection.query(`UNLOCK TABLES`);
+
+                // check if procurement exists
+
+                await db_connection.query(`LOCK TABLES Procurement READ`);
+
+                let [procurement] = await db_connection.query(`SELECT * from Procurement WHERE procurementID = ?`, [req.body.procurementID]);
+
+                if (procurement.length === 0) {
+                    await db_connection.query(`UNLOCK TABLES`);
+                    return res.status(400).send({ "message": "Procurement not found!" });
+                }
+
+                await db_connection.query(`UNLOCK TABLES`);
+
+                // check if procurement is in status 0
+                if (procurement[0].procurementStatus !== '0' || procurement[0].prcNo !== null) {
+                    return res.status(400).send({ "message": "Either PRC already exists or invalid operation!" });
+                }
+
+                // check for file
+                const form = formidable({});
+
+                form.parse(req, async (err, fields, files) => {
+                    if (err) {
+                        console.log(err);
+                        const time = new Date();
+                        fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - uploadPRC - ${err}\n`);
+                        await db_connection.query(`UNLOCK TABLES`);
+                        return res.status(500).send({ "message": "Internal Server Error." });
+                    }
+
+                    if (files.prc === null || files.prc === undefined || files.prc === "") {
+                        return res.status(400).send({ "message": "Missing PRC file!" });
+                    }
+
+                    // upload file
+                    const file = files.prc;
+                    const file_name = procurement[0].procurementID + "_PRC.pdf";
+                    const file_path = path.join(__dirname, "../uploads/PRC/", file_name);
+
+                    fs.rename(file.path, file_path, async (err) => {
+                        if (err) {
+                            console.log(err);
+                            const time = new Date();
+                            fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - uploadPRC - ${err}\n`);
+                            await db_connection.query(`UNLOCK TABLES`);
+                            return res.status(500).send({ "message": "Internal Server Error." });
+                        }
+
+                        // update procurement
+                        await db_connection.query(`LOCK TABLES Procurement WRITE`);
+
+                        await db_connection.query(`UPDATE Procurement SET prcNo = ? WHERE procurementID = ? AND procurementStatus = ?`, [file_name, req.body.procurementID, '1']);
+
+                        await db_connection.query(`UNLOCK TABLES`);
+
+                        return res.status(200).send({ "message": "PRC uploaded successfully!" });
+                    });
+                });
+
+            } catch (err) {
+                console.log(err);
+                const time = new Date();
+                fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - uploadPRC - ${err}\n`);
+                return res.status(500).send({ "message": "Internal Server Error." });
+            } finally {
+                await db_connection.query(`UNLOCK TABLES`);
+                db_connection.release();
+            }
+        }
+    ],
+
+    newVendor: [
+        webTokenValidator,
+        async (req, res) => {
+            if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
+                req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
+                req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" ||
+                (req.authorization_tier != "0" && req.authorization_tier != "1")) {
+                return res.status(400).send({ "message": "Access Restricted!" });
+            }
+
+            if (req.body.vendorOrganization === null || req.body.vendorOrganization === undefined || req.body.vendorOrganization === "" ||
+                req.body.vendorEmail === null || req.body.vendorEmail === undefined || req.body.vendorEmail === "" || !validator.isEmail(req.body.vendorEmail) ||
+                req.body.msme === null || req.body.msme === undefined || req.body.msme === "" ||
+                req.body.womenOwned === null || req.body.womenOwned === undefined || req.body.womenOwned === "" ||
+                req.body.scst === null || req.body.scst === undefined || req.body.scst === "") {
+                return res.status(400).send({ "message": "Missing details." });
+            }
+
+            if (req.body.msme !== "0" && req.body.msme !== "1" ||
+                req.body.womenOwned !== "0" && req.body.womenOwned !== "1" ||
+                req.body.scst !== "0" && req.body.scst !== "1") {
+                return res.status(400).send({ "message": "Invalid details." });
+            }
+
+            let db_connection = await db.promise().getConnection();
+
+            try {
+
+                // check if user exists and is 0 or 1
+                await db_connection.query(`LOCK TABLES USER READ`);
+
+                let [user] = await db_connection.query(`SELECT * from USER WHERE userEmail = ? AND userRole = ?`, [req.body.userEmail, req.authorization_tier]);
+
+                if (user.length === 0) {
+                    await db_connection.query(`UNLOCK TABLES`);
+                    return res.status(400).send({ "message": "User not found!" });
+                }
+
+                await db_connection.query(`UNLOCK TABLES`);
+
+                // check if vendor exists
+                await db_connection.query(`LOCK TABLES Vendor READ`);
+
+                let [vendor] = await db_connection.query(`SELECT * from Vendor WHERE vendorEmail = ?`, [req.body.vendorEmail]);
+
+                if (vendor.length > 0) {
+                    await db_connection.query(`UNLOCK TABLES`);
+                    return res.status(400).send({ "message": "Vendor already exists!" });
+                }
+
+                await db_connection.query(`UNLOCK TABLES`);
+
+                // create vendor
+                await db_connection.query(`LOCK TABLES Vendor WRITE`);
+
+                let [insert_id] = await db_connection.query(`INSERT INTO Vendor (vendorOrganization, vendorEmail, msme, womenOwned, scst) VALUES (?, ?, ?, ?, ?)`, [req.body.vendorOrganization, req.body.vendorEmail, req.body.msme, req.body.womenOwned, req.body.scst]);
+
+                await db_connection.query(`UNLOCK TABLES`);
+
+                return res.status(200).send({ 
+                    "message": "Vendor created!", 
+                    "vendorID": insert_id.insertId, 
+                    "vendorName":  req.body.vendorOrganization + (req.body.msme === "1" ? " | MSME" : "") + (req.body.womenOwned === "1" ? " | Women Owned" : "") + (req.body.scst === "1" ? " | SCST" : "")
+                });
+            } catch (err) {
+                console.log(err);
+                const time = new Date();
+                fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - newVendor - ${err}\n`);
+                return res.status(500).send({ "message": "Internal Server Error." });
+            } finally {
+                await db_connection.query(`UNLOCK TABLES`);
+                db_connection.release();
+            }
+
+        }
+    ],
+
+
+    // USELESS FUNCTIONS. Can get all of this from all procurements and filter em in frontend.
+
+    // getMSME: [
+    //     webTokenValidator,
+    //     async (req, res) => {
+    //         if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
+    //             req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
+    //             req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" ||
+    //             (req.authorization_tier != "0" && req.authorization_tier != "1" && req.authorization_tier != "2" && req.authorization_tier != "3" && req.authorization_tier != "4")) {
+    //             return res.status(400).send({ "message": "Access Restricted!" });
+    //         }
+
+    //         let db_connection = await db.promise().getConnection();
+
+
+    //         try {
+
+
+    //             await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ`);
+
+    //             let [procurements] = await db_connection.query(` select p.goodsType, p.goodsQuantity, v.vendorOrganization
+    //                 from procurement p left join vendor v on p.vendorID = v.vendorID
+    //                 where v.msme='1';`);
+
+    //             await db_connection.query(`UNLOCK TABLES`);
+
+    //             return res.status(200).send({
+    //                 "message": "All MSME Procurements fetched successfully!",
+    //                 "procurements": procurements
+    //             });
+
+    //         } catch (err) {
+    //             console.log(err);
+    //             const time = new Date();
+    //             fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - getmsme - ${err}\n`);
+    //             return res.status(500).send({ "message": "Internal Server Error." });
+    //         } finally {
+    //             await db_connection.query(`UNLOCK TABLES`);
+    //             db_connection.release();
+    //         }
+    //     }
+    // ],
+    // getWomen: [
+    //     webTokenValidator,
+    //     async (req, res) => {
+    //         if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
+    //             req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
+    //             req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" ||
+    //             (req.authorization_tier != "0" && req.authorization_tier != "1" && req.authorization_tier != "2" && req.authorization_tier != "3" && req.authorization_tier != "4")) {
+    //             return res.status(400).send({ "message": "Access Restricted!" });
+    //         }
+
+    //         let db_connection = await db.promise().getConnection();
+
+
+    //         try {
+
+
+    //             await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ`);
+
+    //             let [procurements] = await db_connection.query(` select p.goodsType, p.goodsQuantity, v.vendorOrganization
+    //                 from procurement p left join vendor v on p.vendorID = v.vendorID
+    //                 where v.womenOwned='1';`);
+
+    //             await db_connection.query(`UNLOCK TABLES`);
+
+    //             return res.status(200).send({
+    //                 "message": "All Women Owned Procurements fetched successfully!",
+    //                 "procurements": procurements
+    //             });
+
+    //         } catch (err) {
+    //             console.log(err);
+    //             const time = new Date();
+    //             fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - getwomen - ${err}\n`);
+    //             return res.status(500).send({ "message": "Internal Server Error." });
+    //         } finally {
+    //             await db_connection.query(`UNLOCK TABLES`);
+    //             db_connection.release();
+    //         }
+    //     }
+    // ],
+
+    // getSCST: [
+    //     webTokenValidator,
+    //     async (req, res) => {
+    //         if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
+    //             req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
+    //             req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" ||
+    //             (req.authorization_tier != "0" && req.authorization_tier != "1" && req.authorization_tier != "2" && req.authorization_tier != "3" && req.authorization_tier != "4")) {
+    //             return res.status(400).send({ "message": "Access Restricted!" });
+    //         }
+
+    //         let db_connection = await db.promise().getConnection();
+
+
+    //         try {
+
+
+    //             await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ`);
+
+    //             let [procurements] = await db_connection.query(` select p.goodsType, p.goodsQuantity, v.vendorOrganization
+    //                 from procurement p left join vendor v on p.vendorID = v.vendorID 
+    //                 where v.scst = '1';`);
+
+    //             await db_connection.query(`UNLOCK TABLES`);
+
+    //             return res.status(200).send({
+    //                 "message": "All SCST Procurements fetched successfully!",
+    //                 "procurements": procurements
+    //             });
+
+    //         } catch (err) {
+    //             console.log(err);
+    //             const time = new Date();
+    //             fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - getscst - ${err}\n`);
+    //             return res.status(500).send({ "message": "Internal Server Error." });
+    //         } finally {
+    //             await db_connection.query(`UNLOCK TABLES`);
+    //             db_connection.release();
+    //         }
+    //     }
+    // ],
 }
