@@ -16,3 +16,4 @@
 2023-10-28T07:09:20.279Z - uploadPRC - Error: ENOENT: no such file or directory, rename '/var/folders/79/k0pjppyx72xcfj5m7k0_zjqm0000gp/T/990e6d00ca60bdacdc027fb00' -> '/Users/ashrock_m13/Ashrockzzz/2023/servers/sih_procurement_management_server/uploads/PRC/1_PRC.pdf'
 2023-10-28T09:11:03.816Z - getAllProcurements - Error: Table 'PAYMENT' was not locked with LOCK TABLES
 2023-10-28T09:11:03.816Z - getAllProcurements - Error: Table 'PAYMENT' was not locked with LOCK TABLES
+2023-10-28T20:02:06.016Z - newVendor - ReferenceError: mailer is not defined

@@ -13,11 +13,11 @@ CREATE TABLE USER (
   PRIMARY KEY (userID),
   UNIQUE (userEmail),
   CHECK (
-    userRole = '0'
-    OR userRole = '1'
-    OR userRole = '2'
-    OR userRole = '3'
-    OR userRole = '4'
+    userRole = '0'     -- 0 - admin
+    OR userRole = '1'  -- 1 - buyer
+    OR userRole = '2'  -- 2 - consignee
+    OR userRole = '3'  -- 3 - PAO
+    OR userRole = '4'  -- 4 - vendor
   )
 );
 CREATE TABLE Payment (

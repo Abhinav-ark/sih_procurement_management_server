@@ -4,7 +4,7 @@ const path = require('path');
 
 const webTokenGenerator = require('../middleware/webTokenGenerator');
 const webTokenValidator = require('../middleware/webTokenValidator');
-
+const mailer = require('../mail/mailer');
 
 const fs = require('fs');
 const validator = require('validator');
@@ -553,14 +553,33 @@ module.exports = {
                     return res.status(400).send({ "message": "Vendor already exists!" });
                 }
 
+                await db_connection.query(`LOCK TABLE USER READ`);
+                let [users] = await db_connection.query(`SELECT * from USER WHERE userEmail = ?`, [req.body.vendorEmail]);
+
+                if (users.length > 0) {
+                    await db_connection.query(`UNLOCK TABLES`);
+                    return res.status(400).send({ "message": "Access restricted!" });
+                }
+
                 await db_connection.query(`UNLOCK TABLES`);
+
+                const vendorPassword = passwordGenerator.randomPassword({
+                    length: 8,
+                    characters: [passwordGenerator.lower, passwordGenerator.upper, passwordGenerator.digits]
+                });
 
                 // create vendor
-                await db_connection.query(`LOCK TABLES Vendor WRITE`);
+                await db_connection.query(`LOCK TABLES Vendor WRITE, USER WRITE`);
 
                 let [insert_id] = await db_connection.query(`INSERT INTO Vendor (vendorOrganization, vendorEmail, msme, womenOwned, scst) VALUES (?, ?, ?, ?, ?)`, [req.body.vendorOrganization, req.body.vendorEmail, req.body.msme, req.body.womenOwned, req.body.scst]);
-
+                
+                await db_connection.query(`INSERT INTO USER (userEmail,userName,userRole,userPassword) VALUES (?, ?, ?, ?)`, [req.body.vendorEmail,req.body.vendorOrganization, '4', vendorPassword]);
+                
                 await db_connection.query(`UNLOCK TABLES`);
+
+                // send email
+
+                mailer.vendorCreated(req.body.vendorOrganization, req.body.vendorEmail, vendorPassword);
 
                 return res.status(200).send({ 
                     "message": "Vendor created!", 
@@ -697,7 +716,7 @@ module.exports = {
                 return res.status(400).send({ "message": "Missing details." });
             }
 
-            if (req.body.officialRole !== "0" && req.body.officialRole !== "1" && req.body.officialRole !== "2" && req.body.officialRole !== "3" && req.body.officialRole !== "4") {
+            if (req.body.officialRole !== "0" && req.body.officialRole !== "1" && req.body.officialRole !== "2" && req.body.officialRole !== "3") {
                 return res.status(400).send({ "message": "Invalid Role!" });
             }
 
@@ -735,6 +754,7 @@ module.exports = {
                 await db_connection.query(`UNLOCK TABLES`);
 
                 // send email to the manager with the password.
+                mailer.officialCreated(req.body.officialName, req.body.officialEmail, managerPassword);
 
                 return res.status(200).send({ "message": "Official registered!" });
                 
