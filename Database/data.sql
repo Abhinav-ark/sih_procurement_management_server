@@ -1,6 +1,5 @@
 drop table if exists Procurement;
 drop table if exists USER;
-drop table if exists Invoice;
 drop table if exists Payment;
 drop table if exists PRC;
 drop table if exists CRAC;
@@ -21,11 +20,6 @@ CREATE TABLE USER (
     OR userRole = '4'
   )
 );
-CREATE TABLE Invoice (
-  invoiceNo INT NOT NULL,
-  invoiceDocument varchar(255) NOT NULL,
-  PRIMARY KEY (invoiceNo)
-);
 CREATE TABLE Payment (
   paymentID INT NOT NULL AUTO_INCREMENT,
   paymentAmount FLOAT NOT NULL,
@@ -43,12 +37,14 @@ CREATE TABLE Payment (
 );
 CREATE TABLE PRC (
   prcNo INT NOT NULL AUTO_INCREMENT,
-  prcDate DATE NOT NULL,
+  file_name VARCHAR(255) NOT NULL,
+  prcDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (prcNo)
 );
 CREATE TABLE CRAC (
   cracNo INT NOT NULL AUTO_INCREMENT,
-  cracDate DATE NOT NULL,
+  file_name VARCHAR(255) NOT NULL,
+  cracDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (cracNo)
 );
 CREATE TABLE Vendor (
@@ -80,16 +76,16 @@ CREATE TABLE Procurement (
   goodsQuantity VARCHAR(20) NOT NULL,
   vendorSelection VARCHAR(20) NOT NULL,
   vendorID INT NOT NULL,
-  invoiceNo INT NULL,
+  invoiceNo INT NOT NULL,
   prcNo INT NULL,
   cracNo INT NULL,
   paymentID INT NULL,
   procurementStatus CHAR(1) NOT NULL DEFAULT "0",
-  procurementBuyer INT NULL,
+  procurementBuyer INT NOT NULL,
   procurementConsignee INT NULL,
   procurementPAO INT NULL,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (procurementID),
-  FOREIGN KEY (invoiceNo) REFERENCES Invoice(invoiceNo),
   FOREIGN KEY (paymentID) REFERENCES Payment(paymentID),
   FOREIGN KEY (prcNo) REFERENCES PRC(prcNo),
   FOREIGN KEY (cracNo) REFERENCES CRAC(cracNo),
@@ -135,16 +131,6 @@ INSERT INTO USER (userEmail, userName, userRole, userPassword)
 VALUES ('sajith@gmail.com', 'Sajith', '3', 'sajith123456');
 INSERT INTO USER (userEmail, userName, userRole, userPassword)
 VALUES ('vakada@gmail.com', 'Vakada', '4', 'vakada123456');
-INSERT INTO INVOICE (invoiceNo, invoiceDocument)
-VALUES (923, "C:\\invoice\\923.pdf");
-INSERT INTO INVOICE (invoiceNo, invoiceDocument)
-VALUES (934, "C:\\invoice\\934.pdf");
-INSERT INTO INVOICE (invoiceNo, invoiceDocument)
-VALUES (1051, "C:\\invoice\\1051.pdf");
-INSERT INTO INVOICE (invoiceNo, invoiceDocument)
-VALUES (1227, "C:\\invoice\\1227.pdf");
-INSERT INTO INVOICE (invoiceNo, invoiceDocument)
-VALUES (7273, "C:\\invoice\\7273.pdf");
 INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
 VALUES (20000.00, 'Internet Banking', 7894);
 INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
@@ -155,26 +141,6 @@ INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
 VALUES (30000.00, 'RTGS', 6653);
 INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
 VALUES (70000.00, 'NEFT', 1252);
-INSERT INTO CRAC (cracDate)
-VALUES ('2023-07-20');
-INSERT INTO CRAC (cracDate)
-VALUES ('2023-08-07');
-INSERT INTO CRAC (cracDate)
-VALUES ('2023-06-10');
-INSERT INTO CRAC (cracDate)
-VALUES ('2023-05-14');
-INSERT INTO CRAC (cracDate)
-VALUES ('2023-05-01');
-INSERT INTO PRC (prcDate)
-VALUES ('2023-07-15');
-INSERT INTO PRC (prcDate)
-VALUES ('2023-08-02');
-INSERT INTO PRC (prcDate)
-VALUES ('2023-06-05');
-INSERT INTO PRC (prcDate)
-VALUES ('2023-05-09');
-INSERT INTO PRC (prcDate)
-VALUES ('2023-04-28');
 INSERT INTO VENDOR (
     vendorOrganization,
     vendorEmail,
@@ -240,13 +206,9 @@ INSERT INTO PROCUREMENT (
     vendorSelection,
     vendorID,
     invoiceNo,
-    prcNo,
-    cracNo,
     paymentID,
     procurementStatus,
-    procurementBuyer,
-    procurementConsignee,
-    procurementPAO
+    procurementBuyer
   )
 VALUES(
     14554,
@@ -256,12 +218,8 @@ VALUES(
     1,
     923,
     1,
-    1,
-    1,
-    "4",
-    2,
-    3,
-    4
+    "0",
+    2
   );
 INSERT INTO PROCUREMENT (
     gemID,
@@ -270,13 +228,9 @@ INSERT INTO PROCUREMENT (
     vendorSelection,
     vendorID,
     invoiceNo,
-    prcNo,
-    cracNo,
     paymentID,
     procurementStatus,
-    procurementBuyer,
-    procurementConsignee,
-    procurementPAO
+    procurementBuyer
   )
 VALUES(
     13454,
@@ -286,12 +240,8 @@ VALUES(
     2,
     934,
     2,
-    2,
-    2,
-    "4",
-    2,
-    3,
-    4
+    "0",
+    2
   );
 INSERT INTO PROCUREMENT (
     gemID,
@@ -300,13 +250,9 @@ INSERT INTO PROCUREMENT (
     vendorSelection,
     vendorID,
     invoiceNo,
-    prcNo,
-    cracNo,
     paymentID,
     procurementStatus,
-    procurementBuyer,
-    procurementConsignee,
-    procurementPAO
+    procurementBuyer
   )
 VALUES(
     13354,
@@ -316,12 +262,8 @@ VALUES(
     3,
     1051,
     3,
-    3,
-    3,
-    "4",
-    2,
-    3,
-    4
+    "0",
+    2
   );
 INSERT INTO PROCUREMENT(
     gemID,
@@ -330,13 +272,9 @@ INSERT INTO PROCUREMENT(
     vendorSelection,
     vendorID,
     invoiceNo,
-    prcNo,
-    cracNo,
     paymentID,
     procurementStatus,
-    procurementBuyer,
-    procurementConsignee,
-    procurementPAO
+    procurementBuyer
   )
 VALUES(
     16254,
@@ -346,12 +284,8 @@ VALUES(
     4,
     1227,
     4,
-    4,
-    4,
-    "4",
-    2,
-    3,
-    4
+    "0",
+    2
   );
 INSERT INTO PROCUREMENT(
     gemID,
@@ -360,13 +294,9 @@ INSERT INTO PROCUREMENT(
     vendorSelection,
     vendorID,
     invoiceNo,
-    prcNo,
-    cracNo,
     paymentID,
     procurementStatus,
-    procurementBuyer,
-    procurementConsignee,
-    procurementPAO
+    procurementBuyer
   )
 VALUES(
     17854,
@@ -376,10 +306,6 @@ VALUES(
     5,
     7273,
     5,
-    5,
-    5,
-    "4",
-    2,
-    3,
-    4
+    "0",
+    2
   );

@@ -1,4 +1,6 @@
-const { db } = require('../connection')
+const { db } = require('../connection');
+var formidable = require("formidable");
+const path = require('path');
 
 const webTokenGenerator = require('../middleware/webTokenGenerator');
 const webTokenValidator = require('../middleware/webTokenValidator');
@@ -86,7 +88,7 @@ module.exports = {
                     p.vendorSelection, p.vendorID, v.vendorOrganization, v.vendorEmail, v.msme, v.womenOwned, v.scst, p.invoiceNo,
                     p.prcNo, p.cracNo, p.paymentId, p.procurementStatus as Status, p.procurementBuyer as Buyer_ID,
                     u_Buyer.userName as Buyer, p.procurementConsignee as Consignee_ID, u_Consignee.userName as Consignee,
-                    p.procurementPAO as Payment_Authority_ID, u_PAO.userName as Payment_Authority
+                    p.procurementPAO as Payment_Authority_ID, u_PAO.userName as Payment_Authority, p.createdAt as Created_At
                     from procurement p left join vendor v on p.vendorID = v.vendorID LEFT JOIN
                     user AS u_Buyer ON p.procurementBuyer = u_Buyer.userID LEFT JOIN user AS u_Consignee 
                     ON p.procurementConsignee = u_Consignee.userID LEFT JOIN user AS u_PAO ON p.procurementPAO = u_PAO.userID;`);
@@ -170,7 +172,7 @@ module.exports = {
             let db_connection = await db.promise().getConnection();
 
             try {
-                await db_connection.query(`LOCK TABLES Vendor READ, Procurement WRITE, INVOICE WRITE, USER READ`);
+                await db_connection.query(`LOCK TABLES Vendor READ, Procurement WRITE, USER READ`);
 
                 let [vendor] = await db_connection.query(`SELECT * from Vendor WHERE vendorID = ?`, [req.body.vendorID]);
 
@@ -184,10 +186,9 @@ module.exports = {
                 if (procurement.length > 0 || procurement1.length > 0) {
                     return res.status(400).send({ "message": "Procurement already exists!" });
                 }
-                await db_connection.query(`INSERT INTO INVOICE (invoiceNo,invoiceDocument) VALUES (?,?)`, [req.body.invoiceNo, "test_doc"]);
                 let [buyer] = await db_connection.query(`Select userID from USER where userEmail = ?`, [req.body.userEmail]);
                 buyer = buyer[0].userID;
-                await db_connection.query(`INSERT into Procurement (gemID, goodsType, goodsQuantity, vendorSelection, vendorID, invoiceNo, procurementStatus, procurementBuyer) values (?, ?, ?, ?, ?, ?, ?, ?)`, [req.body.gemID, req.body.goodsType, req.body.goodsQuantity, req.body.vendorSelection, req.body.vendorID, req.body.invoiceNo, "1", buyer]);
+                await db_connection.query(`INSERT into Procurement (gemID, goodsType, goodsQuantity, vendorSelection, vendorID, invoiceNo, procurementStatus, procurementBuyer) values (?, ?, ?, ?, ?, ?, ?, ?)`, [req.body.gemID, req.body.goodsType, req.body.goodsQuantity, req.body.vendorSelection, req.body.vendorID, req.body.invoiceNo, "0", buyer]);
                 await db_connection.query(`UNLOCK TABLES`);
 
                 return res.status(200).send({ "message": "Procurement created!" });
@@ -303,7 +304,9 @@ module.exports = {
                 return res.status(400).send({ "message": "Access Restricted!" });
             }
 
-            if (req.body.procurementID === null || req.body.procurementID === undefined || req.body.procurementID === "" || isNaN(req.body.procurementID)) {
+            const procurementID = req.headers.authorization.split(' ')[2];
+
+            if (procurementID === null || procurementID === undefined || procurementID === "" || isNaN(procurementID)) {
                 return res.status(400).send({ "message": "Missing details." });
             }
 
@@ -326,7 +329,7 @@ module.exports = {
 
                 await db_connection.query(`LOCK TABLES Procurement READ`);
 
-                let [procurement] = await db_connection.query(`SELECT * from Procurement WHERE procurementID = ?`, [req.body.procurementID]);
+                let [procurement] = await db_connection.query(`SELECT * from Procurement WHERE procurementID = ?`, [procurementID]);
 
                 if (procurement.length === 0) {
                     await db_connection.query(`UNLOCK TABLES`);
@@ -340,8 +343,7 @@ module.exports = {
                     return res.status(400).send({ "message": "Either PRC already exists or invalid operation!" });
                 }
 
-                // check for file
-                const form = formidable({});
+                var form = new formidable.IncomingForm();
 
                 form.parse(req, async (err, fields, files) => {
                     if (err) {
@@ -357,11 +359,11 @@ module.exports = {
                     }
 
                     // upload file
-                    const file = files.prc;
+                    const file = files.prc[0];
                     const file_name = procurement[0].procurementID + "_PRC.pdf";
-                    const file_path = path.join(__dirname, "../uploads/PRC/", file_name);
+                    const file_path = path.join(__dirname, '../uploads/PRC/' + file_name);
 
-                    fs.rename(file.path, file_path, async (err) => {
+                    fs.rename(file.filepath, file_path, async (err) => {
                         if (err) {
                             console.log(err);
                             const time = new Date();
@@ -371,9 +373,10 @@ module.exports = {
                         }
 
                         // update procurement
-                        await db_connection.query(`LOCK TABLES Procurement WRITE`);
+                        await db_connection.query(`LOCK TABLES Procurement WRITE, PRC WRITE`);
+                        let [insert_id] = await db_connection.query(`INSERT INTO PRC (file_name) VALUES (?)`, [file_name]);
 
-                        await db_connection.query(`UPDATE Procurement SET prcNo = ? WHERE procurementID = ? AND procurementStatus = ?`, [file_name, req.body.procurementID, '1']);
+                        await db_connection.query(`UPDATE Procurement SET prcNo = ?, procurementStatus = ?, procurementConsignee = ? WHERE procurementID = ?`, [insert_id.insertId, '1', user[0].userID, procurementID]);
 
                         await db_connection.query(`UNLOCK TABLES`);
 
@@ -392,6 +395,110 @@ module.exports = {
             }
         }
     ],
+
+
+    uploadCRAC: [
+        webTokenValidator,
+        async (req, res) => {
+            if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
+                req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
+                req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" ||
+                (req.authorization_tier != "0" && req.authorization_tier != "2")) {
+                return res.status(400).send({ "message": "Access Restricted!" });
+            }
+
+            const procurementID = req.headers.authorization.split(' ')[2];
+
+            if (procurementID === null || procurementID === undefined || procurementID === "" || isNaN(procurementID)) {
+                return res.status(400).send({ "message": "Missing details." });
+            }
+
+            let db_connection = await db.promise().getConnection();
+
+            try {
+                // check if user exists and is 0 or 2
+                await db_connection.query(`LOCK TABLES USER READ`);
+
+                let [user] = await db_connection.query(`SELECT * from USER WHERE userEmail = ? AND userRole = ?`, [req.body.userEmail, req.authorization_tier]);
+
+                if (user.length === 0) {
+                    await db_connection.query(`UNLOCK TABLES`);
+                    return res.status(400).send({ "message": "User not found!" });
+                }
+
+                await db_connection.query(`UNLOCK TABLES`);
+
+                // check if procurement exists
+
+                await db_connection.query(`LOCK TABLES Procurement READ`);
+
+                let [procurement] = await db_connection.query(`SELECT * from Procurement WHERE procurementID = ?`, [procurementID]);
+
+                if (procurement.length === 0) {
+                    await db_connection.query(`UNLOCK TABLES`);
+                    return res.status(400).send({ "message": "Procurement not found!" });
+                }
+
+                await db_connection.query(`UNLOCK TABLES`);
+
+                // check if procurement is in status 0
+                if (procurement[0].procurementStatus !== '1' || procurement[0].cracNo !== null) {
+                    return res.status(400).send({ "message": "Either PRC already exists or invalid operation!" });
+                }
+
+                var form = new formidable.IncomingForm();
+
+                form.parse(req, async (err, fields, files) => {
+                    if (err) {
+                        console.log(err);
+                        const time = new Date();
+                        fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - uploadCRAC - ${err}\n`);
+                        await db_connection.query(`UNLOCK TABLES`);
+                        return res.status(500).send({ "message": "Internal Server Error." });
+                    }
+
+                    if (files.crac === null || files.crac === undefined || files.crac === "") {
+                        return res.status(400).send({ "message": "Missing PRC file!" });
+                    }
+
+                    // upload file
+                    const file = files.crac[0];
+                    const file_name = procurement[0].procurementID + "_CRAC.pdf";
+                    const file_path = path.join(__dirname, '../uploads/CRAC/' + file_name);
+
+                    fs.rename(file.filepath, file_path, async (err) => {
+                        if (err) {
+                            console.log(err);
+                            const time = new Date();
+                            fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - uploadCRAC - ${err}\n`);
+                            await db_connection.query(`UNLOCK TABLES`);
+                            return res.status(500).send({ "message": "Internal Server Error." });
+                        }
+
+                        // update procurement
+                        await db_connection.query(`LOCK TABLES Procurement WRITE, CRAC WRITE`);
+                        let [insert_id] = await db_connection.query(`INSERT INTO CRAC (file_name) VALUES (?)`, [file_name]);
+
+                        await db_connection.query(`UPDATE Procurement SET cracNo = ?, procurementStatus = ?, procurementConsignee = ? WHERE procurementID = ?`, [insert_id.insertId, '2', user[0].userID, procurementID]);
+
+                        await db_connection.query(`UNLOCK TABLES`);
+
+                        return res.status(200).send({ "message": "CRAC uploaded successfully!" });
+                    });
+                });
+
+            } catch (err) {
+                console.log(err);
+                const time = new Date();
+                fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - uploadPRC - ${err}\n`);
+                return res.status(500).send({ "message": "Internal Server Error." });
+            } finally {
+                await db_connection.query(`UNLOCK TABLES`);
+                db_connection.release();
+            }
+        }
+    ],
+
 
     newVendor: [
         webTokenValidator,

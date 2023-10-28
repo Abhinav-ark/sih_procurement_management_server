@@ -9,3 +9,8 @@
 2023-10-04T08:33:50.978Z - getAllProcurements - Error: Table 'u_buyer' was not locked with LOCK TABLES
 2023-10-25T04:03:26.879Z - createProcurement - Error: Column 'vendorSelection' cannot be null
 2023-10-25T08:17:23.339Z - getVendors - Error: Table 'neepco_procurement_management.vendors' doesn't exist
+2023-10-28T06:52:45.979Z - uploadPRC - ReferenceError: formidable is not defined
+2023-10-28T06:53:00.459Z - uploadPRC - TypeError: formidable is not a function
+2023-10-28T06:56:19.460Z - uploadPRC - TypeError: formidable is not a function
+2023-10-28T06:57:51.106Z - uploadPRC - Error: bad content-type header, no multipart boundary
+2023-10-28T07:09:20.279Z - uploadPRC - Error: ENOENT: no such file or directory, rename '/var/folders/79/k0pjppyx72xcfj5m7k0_zjqm0000gp/T/990e6d00ca60bdacdc027fb00' -> '/Users/ashrock_m13/Ashrockzzz/2023/servers/sih_procurement_management_server/uploads/PRC/1_PRC.pdf'

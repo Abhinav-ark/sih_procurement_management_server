@@ -8,6 +8,7 @@ router.post('/login', userWebController.userLogin);
 router.post('/createProcurement', userWebController.createProcurement);
 router.post('/deleteProcurement',userWebController.deleteProcurement);
 router.post('/uploadPRC',userWebController.uploadPRC);
+router.post('/uploadCRAC', userWebController.uploadCRAC);
 router.post('/newVendor', userWebController.newVendor);
 
 router.get('/getAllProcurements', userWebController.getAllProcurements);
