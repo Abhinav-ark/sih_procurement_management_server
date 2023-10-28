@@ -9,6 +9,8 @@ const webTokenValidator = require('../middleware/webTokenValidator');
 const fs = require('fs');
 const validator = require('validator');
 
+const passwordGenerator = require('secure-random-password');
+
 module.exports = {
     test: async (req, res) => {
         return res.status(200).send({ "message": 'Ok' });
@@ -82,16 +84,16 @@ module.exports = {
             try {
 
                 if (req.authorization_tier !== "4") {
-                    await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ, USER u_Buyer READ, USER u_Consignee READ, USER u_PAO READ`);
+                    await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ, USER u_Buyer READ, USER u_Consignee READ, USER u_PAO READ, PAYMENT READ`);
 
                     let [procurements] = await db_connection.query(` select p.procurementID, p.gemID, p.goodsType, p.goodsQuantity, 
                     p.vendorSelection, p.vendorID, v.vendorOrganization, v.vendorEmail, v.msme, v.womenOwned, v.scst, p.invoiceNo,
-                    p.prcNo, p.cracNo, p.paymentId, p.procurementStatus as Status, p.procurementBuyer as Buyer_ID,
+                    p.prcNo, p.cracNo, p.paymentId, PAYMENT.transactionID, PAYMENT.paymentMode, PAYMENT.paymentAmount, p.procurementStatus as Status, p.procurementBuyer as Buyer_ID,
                     u_Buyer.userName as Buyer, p.procurementConsignee as Consignee_ID, u_Consignee.userName as Consignee,
                     p.procurementPAO as Payment_Authority_ID, u_PAO.userName as Payment_Authority, p.createdAt as Created_At
                     from procurement p left join vendor v on p.vendorID = v.vendorID LEFT JOIN
                     user AS u_Buyer ON p.procurementBuyer = u_Buyer.userID LEFT JOIN user AS u_Consignee 
-                    ON p.procurementConsignee = u_Consignee.userID LEFT JOIN user AS u_PAO ON p.procurementPAO = u_PAO.userID;`);
+                    ON p.procurementConsignee = u_Consignee.userID LEFT JOIN user AS u_PAO ON p.procurementPAO = u_PAO.userID LEFT JOIN PAYMENT ON p.paymentId = PAYMENT.paymentID;`);
 
                     await db_connection.query(`UNLOCK TABLES`);
 
@@ -670,6 +672,120 @@ module.exports = {
                 console.log(err);
                 const time = new Date();
                 fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - updatePaymentDetails - ${err}\n`);
+                return res.status(500).send({ "message": "Internal Server Error." });
+            } finally {
+                await db_connection.query(`UNLOCK TABLES`);
+                db_connection.release();
+            }
+        }
+    ],
+
+    registerOfficial: [
+        webTokenValidator,
+        async (req, res) => {
+            if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
+                req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
+                req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" ||
+                (req.authorization_tier != "0")) {
+                return res.status(400).send({ "message": "Access Restricted!" });
+            }
+
+            if (req.body.officialEmail === null || req.body.officialEmail === undefined || req.body.officialEmail === "" || !validator.isEmail(req.body.officialEmail) ||
+                req.body.officialName === null || req.body.officialName === undefined || req.body.officialName === "" ||
+                req.body.officialRole === null || req.body.officialRole === undefined || req.body.officialRole === "") {
+                return res.status(400).send({ "message": "Missing details." });
+            }
+
+            if (req.body.officialRole !== "0" && req.body.officialRole !== "1" && req.body.officialRole !== "2" && req.body.officialRole !== "3" && req.body.officialRole !== "4") {
+                return res.status(400).send({ "message": "Invalid Role!" });
+            }
+
+            let db_connection = await db.promise().getConnection();
+
+            try {
+                await db_connection.query(`LOCK TABLES USER READ`);
+                let [user] = await db_connection.query(`SELECT * from USER WHERE userEmail = ? AND userRole = ?`, [req.body.userEmail, req.authorization_tier]);
+
+                if (user.length === 0 || user[0].userRole !== '0') {
+                    await db_connection.query(`UNLOCK TABLES`);
+                    return res.status(400).send({ "message": "Access denied!" });
+                }
+
+                let [official] = await db_connection.query(`SELECT * from USER WHERE userEmail = ?`, [req.body.officialEmail]);
+
+                if (official.length > 0) {
+                    await db_connection.query(`UNLOCK TABLES`);
+                    return res.status(400).send({ "message": "Official already exists!" });
+                }
+
+                // generate a random password for the manager.
+                const managerPassword = passwordGenerator.randomPassword({
+                    length: 8,
+                    characters: [passwordGenerator.lower, passwordGenerator.upper, passwordGenerator.digits]
+                });
+
+                // SHA256 hash the password.
+                // const passwordHashed = crypto.createHash('sha256').update(managerPassword).digest('hex');
+
+                await db_connection.query(`LOCK TABLES USER WRITE`);
+
+                await db_connection.query(`INSERT INTO USER (userEmail, userName, userRole, userPassword) VALUES (?, ?, ?, ?)`, [req.body.officialEmail, req.body.officialName, req.body.officialRole, managerPassword]);
+
+                await db_connection.query(`UNLOCK TABLES`);
+
+                // send email to the manager with the password.
+
+                return res.status(200).send({ "message": "Official registered!" });
+                
+            } catch (err) {
+                console.log(err);
+                const time = new Date();
+                fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - registerOfficial - ${err}\n`);
+                return res.status(500).send({ "message": "Internal Server Error." });
+            } finally {
+                await db_connection.query(`UNLOCK TABLES`);
+                db_connection.release();
+            }
+        }
+    ],
+
+    getRegisteredOfficials: [
+        webTokenValidator,
+        async (req, res) => {
+            if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
+                req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
+                req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" ||
+                (req.authorization_tier != "0")) {
+                return res.status(400).send({ "message": "Access Restricted!" });
+            }
+
+            let db_connection = await db.promise().getConnection();
+
+            try {
+                await db_connection.query(`LOCK TABLES USER READ`);
+
+                let [user] = await db_connection.query(`SELECT * from USER WHERE userEmail = ? AND userRole = ?`, [req.body.userEmail, req.authorization_tier]);
+
+                if (user.length === 0 || user[0].userRole !== '0') {
+                    await db_connection.query(`UNLOCK TABLES`);
+                    return res.status(400).send({ "message": "Access denied!" });
+                }
+
+                let [officials] = await db_connection.query(`SELECT userID, userEmail, userName, userRole FROM USER`);
+
+                await db_connection.query(`UNLOCK TABLES`);
+
+                if (officials.length === 0) {
+                    return res.status(200).send({ "message": "No officials found!", "officials": [] });
+                }
+
+                return res.status(200).send({ "message": "Officials fetched successfully!", "officials": officials });
+
+
+            } catch (err) {
+                console.log(err);
+                const time = new Date();
+                fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - getRegisteredOfficials - ${err}\n`);
                 return res.status(500).send({ "message": "Internal Server Error." });
             } finally {
                 await db_connection.query(`UNLOCK TABLES`);

@@ -26,6 +26,7 @@
     "mongoose": "^7.5.3",
     "mysql2": "^3.6.1",
     "paseto": "^3.1.4",
+    "secure-random-password": "^0.2.3",
     "validator": "^13.11.0"
   }
 }

@@ -11,9 +11,11 @@ router.post('/uploadPRC',userWebController.uploadPRC);
 router.post('/uploadCRAC', userWebController.uploadCRAC);
 router.post('/newVendor', userWebController.newVendor);
 router.post('/updatePaymentDetails', userWebController.updatePaymentDetails);
+router.post('/registerOfficial', userWebController.registerOfficial);
 
 router.get('/getAllProcurements', userWebController.getAllProcurements);
 router.get('/getVendors', userWebController.getVendors);
+router.get('/getRegisteredOfficials', userWebController.getRegisteredOfficials);
 
 // router.get('/getMSMEProcurements',userWebController.getMSME);
 // router.get('/getWomenProcurements',userWebController.getWomen);

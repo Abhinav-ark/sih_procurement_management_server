@@ -131,16 +131,16 @@ INSERT INTO USER (userEmail, userName, userRole, userPassword)
 VALUES ('sajith@gmail.com', 'Sajith', '3', 'sajith123456');
 INSERT INTO USER (userEmail, userName, userRole, userPassword)
 VALUES ('vakada@gmail.com', 'Vakada', '4', 'vakada123456');
-INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
-VALUES (20000.00, 'Internet Banking', 7894);
-INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
-VALUES (25000.00, 'NEFT', 9396);
-INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
-VALUES (45000.00, 'IMPS', 8391);
-INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
-VALUES (30000.00, 'RTGS', 6653);
-INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
-VALUES (70000.00, 'NEFT', 1252);
+-- INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
+-- VALUES (20000.00, 'Internet Banking', 7894);
+-- INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
+-- VALUES (25000.00, 'NEFT', 9396);
+-- INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
+-- VALUES (45000.00, 'IMPS', 8391);
+-- INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
+-- VALUES (30000.00, 'RTGS', 6653);
+-- INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
+-- VALUES (70000.00, 'NEFT', 1252);
 INSERT INTO VENDOR (
     vendorOrganization,
     vendorEmail,
@@ -206,7 +206,6 @@ INSERT INTO PROCUREMENT (
     vendorSelection,
     vendorID,
     invoiceNo,
-    paymentID,
     procurementStatus,
     procurementBuyer
   )
@@ -217,7 +216,6 @@ VALUES(
     'bidding',
     1,
     923,
-    1,
     "0",
     2
   );
@@ -228,7 +226,6 @@ INSERT INTO PROCUREMENT (
     vendorSelection,
     vendorID,
     invoiceNo,
-    paymentID,
     procurementStatus,
     procurementBuyer
   )
@@ -239,7 +236,6 @@ VALUES(
     'direct-purchase',
     2,
     934,
-    2,
     "0",
     2
   );
@@ -250,7 +246,6 @@ INSERT INTO PROCUREMENT (
     vendorSelection,
     vendorID,
     invoiceNo,
-    paymentID,
     procurementStatus,
     procurementBuyer
   )
@@ -261,7 +256,6 @@ VALUES(
     'bidding',
     3,
     1051,
-    3,
     "0",
     2
   );
@@ -272,7 +266,6 @@ INSERT INTO PROCUREMENT(
     vendorSelection,
     vendorID,
     invoiceNo,
-    paymentID,
     procurementStatus,
     procurementBuyer
   )
@@ -283,7 +276,6 @@ VALUES(
     'bidding',
     4,
     1227,
-    4,
     "0",
     2
   );
@@ -294,7 +286,6 @@ INSERT INTO PROCUREMENT(
     vendorSelection,
     vendorID,
     invoiceNo,
-    paymentID,
     procurementStatus,
     procurementBuyer
   )
@@ -305,7 +296,6 @@ VALUES(
     'direct-purchase',
     5,
     7273,
-    5,
     "0",
     2
   );
