@@ -47,6 +47,25 @@ module.exports = {
                 const Roles = ["Admin", "Buyer", "Consignee", "Payment Authority", "Vendor"];
                 const userRole = Roles[parseInt(user[0].userRole)];
 
+                if(user[0].userRole === '4') {
+                    let [vendor] = await db_connection.query(`SELECT * from Vendor WHERE vendorEmail = ?`, [req.body.userEmail]);
+                    // if(vendor.length === 0) {
+                    //     return res.status(400).send({ "message": "Vendor not found!" });
+                    // }
+                    return res.status(200).send({
+                        "message": "Vendor logged in!",
+                        "SECRET_TOKEN": secret_token,
+                        "userEmail": user[0].userEmail,
+                        "userName": user[0].userName,
+                        "userRole": userRole,
+                        "vendorID": vendor[0].vendorID,
+                        "vendorOrganization": vendor[0].vendorOrganization,
+                        "msme": vendor[0].MSME,
+                        "womenOwned": vendor[0].womenOwned,
+                        "scst": vendor[0].SCST
+                    });
+                }
+
                 return res.status(200).send({
                     "message": user[0].userRole === '0' ? "Admin logged in" : "User logged in!",
                     "SECRET_TOKEN": secret_token,

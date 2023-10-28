@@ -131,6 +131,14 @@ INSERT INTO USER (userEmail, userName, userRole, userPassword)
 VALUES ('sajith@gmail.com', 'Sajith', '3', 'sajith123456');
 INSERT INTO USER (userEmail, userName, userRole, userPassword)
 VALUES ('vakada@gmail.com', 'Vakada', '4', 'vakada123456');
+INSERT INTO USER (userEmail, userName, userRole, userPassword)
+VALUES ('praveen@gmail.com', 'Praveen', '4', 'praveen123456');
+INSERT INTO USER (userEmail, userName, userRole, userPassword)
+VALUES ('snake@gmail.com', 'The Paambu Company', '4', 'paambu123456');
+INSERT INTO USER (userEmail, userName, userRole, userPassword)
+VALUES ('saravana@gmail.com', 'Thatha Corp.', '4', 'thatha123456');
+INSERT INTO USER (userEmail, userName, userRole, userPassword)
+VALUES ('david@gmail.com', 'David', '4', 'david123456');
 -- INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
 -- VALUES (20000.00, 'Internet Banking', 7894);
 -- INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
