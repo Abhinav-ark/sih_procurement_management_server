@@ -15,6 +15,7 @@ router.post('/registerOfficial', userWebController.registerOfficial);
 
 router.get('/getAllProcurements', userWebController.getAllProcurements);
 router.get('/getVendors', userWebController.getVendors);
+router.get('/allVendors', userWebController.allVendors);
 router.get('/getRegisteredOfficials', userWebController.getRegisteredOfficials);
 
 // router.get('/getMSMEProcurements',userWebController.getMSME);

@@ -517,6 +517,7 @@ module.exports = {
                 req.body.msme === null || req.body.msme === undefined || req.body.msme === "" ||
                 req.body.womenOwned === null || req.body.womenOwned === undefined || req.body.womenOwned === "" ||
                 req.body.scst === null || req.body.scst === undefined || req.body.scst === "") {
+                    console.log(req.body);
                 return res.status(400).send({ "message": "Missing details." });
             }
 
@@ -792,7 +793,46 @@ module.exports = {
                 db_connection.release();
             }
         }
-    ]
+    ],
+
+    allVendors: [
+        webTokenValidator,
+        async (req, res) => {
+            if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
+                req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
+                req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" || req.authorization_tier === "2" || req.authorization_tier === "3" || req.authorization_tier === "4" ||
+                (req.authorization_tier != "0" && req.authorization_tier != "1")) {
+                return res.status(400).send({ "message": "Access Restricted!" });
+            }
+
+            let db_connection = await db.promise().getConnection();
+
+            try {
+                await db_connection.query(`LOCK TABLES Vendor READ`);
+
+                let [Vendors] = await db_connection.query(`Select * from Vendor`);
+
+                if (Vendors.length === 0) {
+                    return res.status(200).send({ "message": "No Vendors found!", "Vendors": [] });
+                }
+
+                return res.status(200).send(
+                    {
+                        "message": "Vendors Fetched Successfully!",
+                        "Vendors": Vendors
+                    });
+
+            } catch (err) {
+                console.log(err);
+                const time = new Date();
+                fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - getVendors - ${err}\n`);
+                return res.status(500).send({ "message": "Internal Server Error." });
+            } finally {
+                await db_connection.query(`UNLOCK TABLES`);
+                db_connection.release();
+            }
+        }
+    ],
 
 
     // USELESS FUNCTIONS. Can get all of this from all procurements and filter em in frontend.
