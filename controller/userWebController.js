@@ -578,6 +578,107 @@ module.exports = {
     ],
 
 
+    updatePaymentDetails: [
+        webTokenValidator,
+        async (req, res) => {
+            if (req.body.userEmail === null || req.body.userEmail === undefined || req.body.userEmail === "" || !validator.isEmail(req.body.userEmail) ||
+                req.body.userRole === null || req.body.userRole === undefined || req.body.userRole === "" ||
+                req.authorization_tier === null || req.authorization_tier === undefined || req.authorization_tier === "" ||
+                (req.authorization_tier != "0" && req.authorization_tier != "3")) {
+                return res.status(400).send({ "message": "Access Restricted!" });
+            }
+
+            /*
+            CREATE TABLE Payment (
+                paymentID INT NOT NULL AUTO_INCREMENT,
+                paymentAmount FLOAT NOT NULL,
+                paymentMode VARCHAR(20) NOT NULL,
+                transactionID INT NOT NULL,
+                PRIMARY KEY (paymentID),
+                UNIQUE (transactionID),
+                CHECK (
+                    paymentMode = 'Internet Banking'
+                    OR paymentMode = 'NEFT'
+                    OR paymentMode = 'IMPS'
+                    OR paymentMode = 'RTGS'
+                    OR paymentMode = 'Other'
+                )
+            );
+            */
+
+            if (req.body.procurementID === null || req.body.procurementID === undefined || req.body.procurementID === "" || isNaN(req.body.procurementID)) {
+                return res.status(400).send({ "message": "Missing details." });
+            }
+
+            if (req.body.paymentAmount === null || req.body.paymentAmount === undefined || req.body.paymentAmount === "" || isNaN(req.body.paymentAmount) ||
+                req.body.paymentMode === null || req.body.paymentMode === undefined || req.body.paymentMode === "" ||
+                req.body.transactionID === null || req.body.transactionID === undefined || req.body.transactionID === "" || isNaN(req.body.transactionID)) {
+                return res.status(400).send({ "message": "Missing details." });
+            }
+
+            if (req.body.paymentMode !== "Internet Banking" && req.body.paymentMode !== "NEFT" && req.body.paymentMode !== "IMPS" && req.body.paymentMode !== "RTGS" && req.body.paymentMode !== "Other") {
+                return res.status(400).send({ "message": "Invalid Payment Mode!" });
+            }
+
+            let db_connection = await db.promise().getConnection();
+
+            try {
+                await db_connection.query(`LOCK TABLES USER READ`);
+
+                let [user] = await db_connection.query(`SELECT * from USER WHERE userEmail = ? AND userRole = ?`, [req.body.userEmail, req.authorization_tier]);
+
+                if (user.length === 0) {
+                    await db_connection.query(`UNLOCK TABLES`);
+                    return res.status(400).send({ "message": "Access denied!" });
+                }
+
+                await db_connection.query(`UNLOCK TABLES`);
+
+                await db_connection.query(`LOCK TABLES Procurement READ, Payment READ`);
+
+                let [procurement] = await db_connection.query(`SELECT * from Procurement WHERE procurementID = ?`, [req.body.procurementID]);
+                let [payment] = await db_connection.query(`SELECT * from Payment WHERE transactionID = ?`, [req.body.transactionID]);
+
+                if (procurement.length === 0) {
+                    await db_connection.query(`UNLOCK TABLES`);
+                    return res.status(400).send({ "message": "Procurement not found!" });
+                }
+
+                if (procurement[0].procurementStatus !== '2') {
+                    await db_connection.query(`UNLOCK TABLES`);
+                    return res.status(400).send({ "message": "Invalid operation!" });
+                }
+
+                if (payment.length > 0) {
+                    await db_connection.query(`UNLOCK TABLES`);
+                    return res.status(400).send({ "message": "Payment already exists!" });
+                }
+
+                await db_connection.query(`UNLOCK TABLES`);
+
+                await db_connection.query(`LOCK TABLES Procurement WRITE, Payment WRITE`);
+
+                let [insert_id] = await db_connection.query(`INSERT INTO Payment (paymentAmount, paymentMode, transactionID) VALUES (?, ?, ?)`, [req.body.paymentAmount, req.body.paymentMode, req.body.transactionID]);
+
+                await db_connection.query(`UPDATE Procurement SET procurementStatus = ?, paymentID = ?, procurementPAO = ? WHERE procurementID = ?`, ['3', insert_id.insertId, user[0].userID, req.body.procurementID]);
+
+                await db_connection.query(`UNLOCK TABLES`);
+
+                return res.status(200).send({ "message": "Payment details updated!" });
+
+            } catch (err) {
+                console.log(err);
+                const time = new Date();
+                fs.appendFileSync('logs/errorLogs.txt', `${time.toISOString()} - updatePaymentDetails - ${err}\n`);
+                return res.status(500).send({ "message": "Internal Server Error." });
+            } finally {
+                await db_connection.query(`UNLOCK TABLES`);
+                db_connection.release();
+            }
+        }
+    ]
+
+
     // USELESS FUNCTIONS. Can get all of this from all procurements and filter em in frontend.
 
     // getMSME: [

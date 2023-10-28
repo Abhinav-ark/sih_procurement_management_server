@@ -10,6 +10,7 @@ router.post('/deleteProcurement',userWebController.deleteProcurement);
 router.post('/uploadPRC',userWebController.uploadPRC);
 router.post('/uploadCRAC', userWebController.uploadCRAC);
 router.post('/newVendor', userWebController.newVendor);
+router.post('/updatePaymentDetails', userWebController.updatePaymentDetails);
 
 router.get('/getAllProcurements', userWebController.getAllProcurements);
 router.get('/getVendors', userWebController.getVendors);
