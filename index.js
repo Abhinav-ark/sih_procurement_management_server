@@ -67,3 +67,9 @@ if (cluster.isPrimary) {
         }
     })
 }
+
+
+
+/*
+Hosted at: http://ptapi.southindia.cloudapp.azure.com:5000/api/test
+*/
