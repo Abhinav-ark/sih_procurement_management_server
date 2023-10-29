@@ -17,3 +17,7 @@
 2023-10-28T09:11:03.816Z - getAllProcurements - Error: Table 'PAYMENT' was not locked with LOCK TABLES
 2023-10-28T09:11:03.816Z - getAllProcurements - Error: Table 'PAYMENT' was not locked with LOCK TABLES
 2023-10-28T20:02:06.016Z - newVendor - ReferenceError: mailer is not defined
+2023-10-29T04:01:05.784Z - getAllProcurements - Error: Table 'p' was not locked with LOCK TABLES
+2023-10-29T06:40:48.559Z - uploadPRC - Error: ENOENT: no such file or directory, rename 'C:\Users\abhin\AppData\Local\Temp\aa2735ae37f70eb72fa4fb200' -> 'D:\SIH\uploads\PRC\1_PRC.pdf'
+2023-10-29T06:42:58.140Z - uploadPRC - Error: EXDEV: cross-device link not permitted, rename 'C:\Users\abhin\AppData\Local\Temp\aa2735ae37f70eb72fa4fb201' -> 'D:\SIH\uploads\PRC\1_PRC.pdf'
+2023-10-29T07:25:43.421Z - uploadCRAC - Error: ENOENT: no such file or directory, copyfile 'C:\Users\abhin\AppData\Local\Temp\bde8180cf14dd1f9631cd4d01' -> 'D:\SIH\uploads\CRAC\1_CRAC.pdf'
