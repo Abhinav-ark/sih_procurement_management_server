@@ -6,7 +6,7 @@ const establishConnection = () => {
     const db = mysql.createConnection({
         host: 'localhost',
         user: 'root',
-        password: 'sql003',
+        password: 'password',
         database: 'neepco_procurement_management',
         multipleStatements: true
     });
