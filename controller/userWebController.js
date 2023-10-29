@@ -389,7 +389,7 @@ module.exports = {
                     const file_name = procurement[0].procurementID + "_PRC.pdf";
                     const file_path = path.join(__dirname, '../uploads/PRC/' + file_name);
 
-                    fs.rename(file.filepath, file_path, async (err) => {
+                    fs.copyFile(file.filepath, file_path, async (err) => {
                         if (err) {
                             console.log(err);
                             const time = new Date();
@@ -492,7 +492,7 @@ module.exports = {
                     const file_name = procurement[0].procurementID + "_CRAC.pdf";
                     const file_path = path.join(__dirname, '../uploads/CRAC/' + file_name);
 
-                    fs.rename(file.filepath, file_path, async (err) => {
+                    fs.copyFile(file.filepath, file_path, async (err) => {
                         if (err) {
                             console.log(err);
                             const time = new Date();
