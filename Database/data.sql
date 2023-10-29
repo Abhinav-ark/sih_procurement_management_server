@@ -207,7 +207,7 @@ INSERT INTO Vendor (
     SCST
   )
 VALUES ('David and Sons', 'david@gmail.com', '0', '0', '1');
-INSERT INTO PROCUREMENT (
+INSERT INTO Procurement (
     gemID,
     goodsType,
     goodsQuantity,
@@ -227,7 +227,7 @@ VALUES(
     "0",
     2
   );
-INSERT INTO PROCUREMENT (
+INSERT INTO Procurement (
     gemID,
     goodsType,
     goodsQuantity,
@@ -247,7 +247,7 @@ VALUES(
     "0",
     2
   );
-INSERT INTO PROCUREMENT (
+INSERT INTO Procurement (
     gemID,
     goodsType,
     goodsQuantity,
@@ -267,7 +267,7 @@ VALUES(
     "0",
     2
   );
-INSERT INTO PROCUREMENT(
+INSERT INTO Procurement(
     gemID,
     goodsType,
     goodsQuantity,
@@ -287,7 +287,7 @@ VALUES(
     "0",
     2
   );
-INSERT INTO PROCUREMENT(
+INSERT INTO Procurement(
     gemID,
     goodsType,
     goodsQuantity,
