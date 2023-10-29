@@ -149,7 +149,7 @@ VALUES ('david@gmail.com', 'David', '4', 'david123456');
 -- VALUES (30000.00, 'RTGS', 6653);
 -- INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
 -- VALUES (70000.00, 'NEFT', 1252);
-INSERT INTO VENDOR (
+INSERT INTO Vendor (
     vendorOrganization,
     vendorEmail,
     MSME,
@@ -163,7 +163,7 @@ VALUES (
     '1',
     '0'
   );
-INSERT INTO VENDOR (
+INSERT INTO Vendor (
     vendorOrganization,
     vendorEmail,
     MSME,
@@ -177,7 +177,7 @@ VALUES (
     '0',
     '0'
   );
-INSERT INTO VENDOR (
+INSERT INTO Vendor (
     vendorOrganization,
     vendorEmail,
     MSME,
@@ -191,7 +191,7 @@ VALUES (
     '1',
     '0'
   );
-INSERT INTO VENDOR (
+INSERT INTO Vendor (
     vendorOrganization,
     vendorEmail,
     MSME,
@@ -199,7 +199,7 @@ INSERT INTO VENDOR (
     SCST
   )
 VALUES ('Thatha Corp.', 'saravana@gmail.com', '0', '0', '0');
-INSERT INTO VENDOR (
+INSERT INTO Vendor (
     vendorOrganization,
     vendorEmail,
     MSME,
