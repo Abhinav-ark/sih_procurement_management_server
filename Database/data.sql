@@ -1,6 +1,6 @@
 drop table if exists Procurement;
 drop table if exists USER;
-drop table if exists Payment;
+drop table if exists PAYMENT;
 drop table if exists PRC;
 drop table if exists CRAC;
 drop table if exists Vendor;
@@ -20,7 +20,7 @@ CREATE TABLE USER (
     OR userRole = '4'  -- 4 - vendor
   )
 );
-CREATE TABLE Payment (
+CREATE TABLE PAYMENT (
   paymentID INT NOT NULL AUTO_INCREMENT,
   paymentAmount FLOAT NOT NULL,
   paymentMode VARCHAR(20) NOT NULL,
@@ -86,7 +86,7 @@ CREATE TABLE Procurement (
   procurementPAO INT NULL,
   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (procurementID),
-  FOREIGN KEY (paymentID) REFERENCES Payment(paymentID),
+  FOREIGN KEY (paymentID) REFERENCES PAYMENT(paymentID),
   FOREIGN KEY (prcNo) REFERENCES PRC(prcNo),
   FOREIGN KEY (cracNo) REFERENCES CRAC(cracNo),
   FOREIGN KEY (vendorID) REFERENCES Vendor(vendorID),
@@ -106,8 +106,8 @@ CREATE TABLE Procurement (
   CHECK (
     procurementStatus = "0"     -- 0 - Waiting for PRC
     or procurementStatus = "1"  -- 1 - Waiting for CRAC || PRC Done
-    or procurementStatus = "2"  -- 2 - Waiting for Payment || CRAC Done
-    or procurementStatus = "3"  -- 3 - Completed || Payment Done
+    or procurementStatus = "2"  -- 2 - Waiting for PAYMENT || CRAC Done
+    or procurementStatus = "3"  -- 3 - Completed || PAYMENT Done
     or procurementStatus = "4"  -- 4 - Cancelled
   )
 );
