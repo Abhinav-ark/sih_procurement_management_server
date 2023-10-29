@@ -5,7 +5,7 @@ const connectionLimit = os.cpus().length;
 const db = mysql.createPool({
     host: 'localhost',
     user: 'root',
-    password: 'sql003', 
+    password: 'password', 
     database: 'neepco_procurement_management',
     waitForConnections: true,
     connectionLimit: connectionLimit,
