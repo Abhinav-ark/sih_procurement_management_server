@@ -17,3 +17,11 @@
 2023-10-28T09:11:03.816Z - getAllProcurements - Error: Table 'PAYMENT' was not locked with LOCK TABLES
 2023-10-28T09:11:03.816Z - getAllProcurements - Error: Table 'PAYMENT' was not locked with LOCK TABLES
 2023-10-28T20:02:06.016Z - newVendor - ReferenceError: mailer is not defined
+2023-10-29T06:09:20.078Z - getAllProcurements - Error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'from Procurement p LEFT JOIN USER
+                    AS u_Buyer ON  p.procureme' at line 3
+2023-10-29T06:09:20.078Z - getAllProcurements - Error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'from Procurement p LEFT JOIN USER
+                    AS u_Buyer ON  p.procureme' at line 3
+2023-10-29T06:09:52.922Z - getAllProcurements - Error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'LEFT JOIN PAYMENT ON p.paymentId = PAYMENT.paymentID' at line 5
+2023-10-29T06:09:52.923Z - getAllProcurements - Error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'LEFT JOIN PAYMENT ON p.paymentId = PAYMENT.paymentID' at line 5
+2023-10-29T06:10:23.251Z - getAllProcurements - Error: Table 'PAYMENT' was not locked with LOCK TABLES
+2023-10-29T06:10:23.251Z - getAllProcurements - Error: Table 'PAYMENT' was not locked with LOCK TABLES
