@@ -103,16 +103,16 @@ module.exports = {
             try {
 
                 if (req.authorization_tier !== "4") {
-                    await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ, USER u_Buyer READ, USER u_Consignee READ, USER u_PAO READ, PAYMENT READ`);
+                    await db_connection.query(`LOCK TABLES Procurement p READ, Vendor v READ, USER u_Buyer READ, USER u_Consignee READ, USER u_PAO READ, Payment READ`);
 
                     let [procurements] = await db_connection.query(` select p.procurementID, p.gemID, p.goodsType, p.goodsQuantity, 
                     p.vendorSelection, p.vendorID, v.vendorOrganization, v.vendorEmail, v.msme, v.womenOwned, v.scst, p.invoiceNo,
-                    p.prcNo, p.cracNo, p.paymentId, PAYMENT.transactionID, PAYMENT.paymentMode, PAYMENT.paymentAmount, p.procurementStatus as Status, p.procurementBuyer as Buyer_ID,
+                    p.prcNo, p.cracNo, p.paymentId, Payment.transactionID, Payment.paymentMode, Payment.paymentAmount, p.procurementStatus as Status, p.procurementBuyer as Buyer_ID,
                     u_Buyer.userName as Buyer, p.procurementConsignee as Consignee_ID, u_Consignee.userName as Consignee,
                     p.procurementPAO as Payment_Authority_ID, u_PAO.userName as Payment_Authority, p.createdAt as Created_At
-                    from procurement p left join vendor v on p.vendorID = v.vendorID LEFT JOIN
+                    from Procurement p left join vendor v on p.vendorID = v.vendorID LEFT JOIN
                     user AS u_Buyer ON p.procurementBuyer = u_Buyer.userID LEFT JOIN user AS u_Consignee 
-                    ON p.procurementConsignee = u_Consignee.userID LEFT JOIN user AS u_PAO ON p.procurementPAO = u_PAO.userID LEFT JOIN PAYMENT ON p.paymentId = PAYMENT.paymentID;`);
+                    ON p.procurementConsignee = u_Consignee.userID LEFT JOIN user AS u_PAO ON p.procurementPAO = u_PAO.userID LEFT JOIN Payment ON p.paymentId = Payment.paymentID;`);
 
                     await db_connection.query(`UNLOCK TABLES`);
 
@@ -121,21 +121,21 @@ module.exports = {
                         "procurements": procurements
                     });
                 } else {
-                    await db_connection.query(`LOCK TABLES Procurement p READ, Vendor READ, USER u_buyer READ, USER u_Consignee READ, USER u_PAO READ, PAYMENT READ`);
+                    await db_connection.query(`LOCK TABLES Procurement p READ, Vendor READ, USER u_buyer READ, USER u_Consignee READ, USER u_PAO READ, Payment READ`);
 
                     let [vendor] = await db_connection.query(`SELECT vendorID from Vendor WHERE vendorEmail = ?`, [req.body.userEmail]);
                     //console.log(id);
 
                     let [procurements] = await db_connection.query(` select p.procurementID, p.gemID, p.goodsType, p.goodsQuantity, 
                     p.vendorSelection, p.vendorID, p.invoiceNo,
-                    p.prcNo, p.cracNo, p.paymentId, PAYMENT.transactionID, PAYMENT.paymentMode, PAYMENT.paymentAmount, p.procurementStatus as Status, p.procurementBuyer as Buyer_ID,
+                    p.prcNo, p.cracNo, p.paymentId, Payment.transactionID, Payment.paymentMode, Payment.paymentAmount, p.procurementStatus as Status, p.procurementBuyer as Buyer_ID,
                     u_Buyer.userName as Buyer, p.procurementConsignee as Consignee_ID, u_Consignee.userName as Consignee,
                     p.procurementPAO as Payment_Authority_ID, u_PAO.userName as Payment_Authority, p.createdAt as Created_At
                     from procurement p 
                     LEFT JOIN user AS u_Buyer ON p.procurementBuyer = u_Buyer.userID 
                     LEFT JOIN user AS u_Consignee ON p.procurementConsignee = u_Consignee.userID 
                     LEFT JOIN user AS u_PAO ON p.procurementPAO = u_PAO.userID 
-                    LEFT JOIN PAYMENT ON p.paymentId = PAYMENT.paymentID WHERE p.vendorID = ?;`, [vendor[0].vendorID]);
+                    LEFT JOIN Payment ON p.paymentId = Payment.paymentID WHERE p.vendorID = ?;`, [vendor[0].vendorID]);
                     //console.log(procurements);
 
                     await db_connection.query(`UNLOCK TABLES`);
