@@ -111,8 +111,8 @@ module.exports = {
                     u_Buyer.userName as Buyer, p.procurementConsignee as Consignee_ID, u_Consignee.userName as Consignee,
                     p.procurementPAO as Payment_Authority_ID, u_PAO.userName as Payment_Authority, p.createdAt as Created_At
                     from Procurement p left join Vendor v on p.vendorID = v.vendorID LEFT JOIN
-                    user AS u_Buyer ON p.procurementBuyer = u_Buyer.userID LEFT JOIN user AS u_Consignee 
-                    ON p.procurementConsignee = u_Consignee.userID LEFT JOIN user AS u_PAO ON p.procurementPAO = u_PAO.userID LEFT JOIN Payment ON p.paymentId = Payment.paymentID;`);
+                    USER AS u_Buyer ON p.procurementBuyer = u_Buyer.userID LEFT JOIN USER AS u_Consignee 
+                    ON p.procurementConsignee = u_Consignee.userID LEFT JOIN USER AS u_PAO ON p.procurementPAO = u_PAO.userID LEFT JOIN Payment ON p.paymentId = Payment.paymentID;`);
 
                     await db_connection.query(`UNLOCK TABLES`);
 
@@ -131,10 +131,10 @@ module.exports = {
                     p.prcNo, p.cracNo, p.paymentId, Payment.transactionID, Payment.paymentMode, Payment.paymentAmount, p.procurementStatus as Status, p.procurementBuyer as Buyer_ID,
                     u_Buyer.userName as Buyer, p.procurementConsignee as Consignee_ID, u_Consignee.userName as Consignee,
                     p.procurementPAO as Payment_Authority_ID, u_PAO.userName as Payment_Authority, p.createdAt as Created_At
-                    from procurement p 
-                    LEFT JOIN user AS u_Buyer ON p.procurementBuyer = u_Buyer.userID 
-                    LEFT JOIN user AS u_Consignee ON p.procurementConsignee = u_Consignee.userID 
-                    LEFT JOIN user AS u_PAO ON p.procurementPAO = u_PAO.userID 
+                    from Procurement p 
+                    LEFT JOIN USER AS u_Buyer ON p.procurementBuyer = u_Buyer.userID 
+                    LEFT JOIN USER AS u_Consignee ON p.procurementConsignee = u_Consignee.userID 
+                    LEFT JOIN USER AS u_PAO ON p.procurementPAO = u_PAO.userID 
                     LEFT JOIN Payment ON p.paymentId = Payment.paymentID WHERE p.vendorID = ?;`, [vendor[0].vendorID]);
                     //console.log(procurements);
 
