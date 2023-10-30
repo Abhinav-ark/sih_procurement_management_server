@@ -1,6 +1,6 @@
 drop table if exists Procurement;
 drop table if exists USER;
-drop table if exists PAYMENT;
+drop table if exists Payment;
 drop table if exists PRC;
 drop table if exists CRAC;
 drop table if exists Vendor;
@@ -20,7 +20,7 @@ CREATE TABLE USER (
     OR userRole = '4'  -- 4 - vendor
   )
 );
-CREATE TABLE PAYMENT (
+CREATE TABLE Payment (
   paymentID INT NOT NULL AUTO_INCREMENT,
   paymentAmount FLOAT NOT NULL,
   paymentMode VARCHAR(20) NOT NULL,
