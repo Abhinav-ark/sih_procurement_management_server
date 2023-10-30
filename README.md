@@ -1,4 +1,4 @@
-# NEEPCO Procurment Management Portal Server
+# NEEPCO Procurement Management Portal Server
 
 This is for Smart India Hackathon 2023.
 
