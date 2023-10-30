@@ -86,7 +86,7 @@ CREATE TABLE Procurement (
   procurementPAO INT NULL,
   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (procurementID),
-  FOREIGN KEY (paymentID) REFERENCES PAYMENT(paymentID),
+  FOREIGN KEY (paymentID) REFERENCES Payment(paymentID),
   FOREIGN KEY (prcNo) REFERENCES PRC(prcNo),
   FOREIGN KEY (cracNo) REFERENCES CRAC(cracNo),
   FOREIGN KEY (vendorID) REFERENCES Vendor(vendorID),
@@ -106,8 +106,8 @@ CREATE TABLE Procurement (
   CHECK (
     procurementStatus = "0"     -- 0 - Waiting for PRC
     or procurementStatus = "1"  -- 1 - Waiting for CRAC || PRC Done
-    or procurementStatus = "2"  -- 2 - Waiting for PAYMENT || CRAC Done
-    or procurementStatus = "3"  -- 3 - Completed || PAYMENT Done
+    or procurementStatus = "2"  -- 2 - Waiting for Payment || CRAC Done
+    or procurementStatus = "3"  -- 3 - Completed || Payment Done
     or procurementStatus = "4"  -- 4 - Cancelled
   )
 );
@@ -139,15 +139,15 @@ INSERT INTO USER (userEmail, userName, userRole, userPassword)
 VALUES ('saravana@gmail.com', 'Thatha Corp.', '4', 'thatha123456');
 INSERT INTO USER (userEmail, userName, userRole, userPassword)
 VALUES ('david@gmail.com', 'David', '4', 'david123456');
--- INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
+-- INSERT INTO Payment (paymentAmount, paymentMode, transactionID)
 -- VALUES (20000.00, 'Internet Banking', 7894);
--- INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
+-- INSERT INTO Payment (paymentAmount, paymentMode, transactionID)
 -- VALUES (25000.00, 'NEFT', 9396);
--- INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
+-- INSERT INTO Payment (paymentAmount, paymentMode, transactionID)
 -- VALUES (45000.00, 'IMPS', 8391);
--- INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
+-- INSERT INTO Payment (paymentAmount, paymentMode, transactionID)
 -- VALUES (30000.00, 'RTGS', 6653);
--- INSERT INTO PAYMENT (paymentAmount, paymentMode, transactionID)
+-- INSERT INTO Payment (paymentAmount, paymentMode, transactionID)
 -- VALUES (70000.00, 'NEFT', 1252);
 INSERT INTO Vendor (
     vendorOrganization,
