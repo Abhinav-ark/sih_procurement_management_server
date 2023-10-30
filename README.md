@@ -1,5 +1,10 @@
-# sih_procurement_management_server
+# NEEPCO Procurment Management Portal Server
 
-```sh
-node index.js
+This is for Smart India Hackathon 2023.
+
+## To Run
+
+```
+npm install
+npm start
 ```
