@@ -126,19 +126,26 @@ VALUES (
     'venky123'
   );
 INSERT INTO USER (userEmail, userName, userRole, userPassword)
-VALUES ('ash@gmail.com', 'Ashwin', '0', 'ash123456');
+VALUES ('ash@gmail.com', 'Ashwin', '0', '267cc9179965323feff48ca29ac366872c095b0762207b17384b1d1cd77c06c7');
+-- ash123456
 INSERT INTO USER (userEmail, userName, userRole, userPassword)
-VALUES ('sajith@gmail.com', 'Sajith', '3', 'sajith123456');
+VALUES ('sajith@gmail.com', 'Sajith', '3', '9fddbb5a442df0b1626b0f4d7c130054bbd2b8f88e170af158eb31a3e47095c6');
+-- sajith123456
 INSERT INTO USER (userEmail, userName, userRole, userPassword)
-VALUES ('vakada@gmail.com', 'Vakada', '4', 'vakada123456');
+VALUES ('vakada@gmail.com', 'Vakada', '4', '9983a7a829ab413a2344d8d537f7176c561670ddbe854c4494d4c98f2b49bd20');
+-- vakada123456
 INSERT INTO USER (userEmail, userName, userRole, userPassword)
-VALUES ('praveen@gmail.com', 'Praveen', '4', 'praveen123456');
+VALUES ('praveen@gmail.com', 'Praveen', '4', 'f2a3d9801533509d935c573517e762a2929c2b510e9c32883009e6deec9cc6eb');
+-- praveen123456
 INSERT INTO USER (userEmail, userName, userRole, userPassword)
-VALUES ('snake@gmail.com', 'The Paambu Company', '4', 'paambu123456');
+VALUES ('snake@gmail.com', 'The Paambu Company', '4', 'e87280d86acf143f89577fd142a9afdb02fe7d3a2b3a46f57d6926761086d30c');
+-- paambu123456
 INSERT INTO USER (userEmail, userName, userRole, userPassword)
-VALUES ('saravana@gmail.com', 'Thatha Corp.', '4', 'thatha123456');
+VALUES ('saravana@gmail.com', 'Thatha Corp.', '4', 'd38625a6d6b3c10a55d7ac84637a56ad83a8374c01897f84aded4168c8e3c217');
+-- thatha123456
 INSERT INTO USER (userEmail, userName, userRole, userPassword)
-VALUES ('david@gmail.com', 'David', '4', 'david123456');
+VALUES ('david@gmail.com', 'David', '4', '17626d12d8599b78c121afbe0da2009f84afcb6549f804b5a1dc36d10565965c');
+-- david123456
 -- INSERT INTO Payment (paymentAmount, paymentMode, transactionID)
 -- VALUES (20000.00, 'Internet Banking', 7894);
 -- INSERT INTO Payment (paymentAmount, paymentMode, transactionID)

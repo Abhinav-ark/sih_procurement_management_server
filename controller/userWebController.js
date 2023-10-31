@@ -10,6 +10,7 @@ const fs = require('fs');
 const validator = require('validator');
 
 const passwordGenerator = require('secure-random-password');
+const crypto = require('crypto');
 
 module.exports = {
     test: async (req, res) => {
@@ -592,12 +593,14 @@ module.exports = {
                     characters: [passwordGenerator.lower, passwordGenerator.upper, passwordGenerator.digits]
                 });
 
+                let passwordHashed = crypto.createHash('sha256').update(vendorPassword).digest('hex'); 
+
                 // create vendor
                 await db_connection.query(`LOCK TABLES Vendor WRITE, USER WRITE`);
 
                 let [insert_id] = await db_connection.query(`INSERT INTO Vendor (vendorOrganization, vendorEmail, msme, womenOwned, scst) VALUES (?, ?, ?, ?, ?)`, [req.body.vendorOrganization, req.body.vendorEmail, req.body.msme, req.body.womenOwned, req.body.scst]);
                 
-                await db_connection.query(`INSERT INTO USER (userEmail,userName,userRole,userPassword) VALUES (?, ?, ?, ?)`, [req.body.vendorEmail,req.body.vendorOrganization, '4', vendorPassword]);
+                await db_connection.query(`INSERT INTO USER (userEmail,userName,userRole,userPassword) VALUES (?, ?, ?, ?)`, [req.body.vendorEmail,req.body.vendorOrganization, '4', passwordHashed]);
                 
                 await db_connection.query(`UNLOCK TABLES`);
 
@@ -769,11 +772,11 @@ module.exports = {
                 });
 
                 // SHA256 hash the password.
-                // const passwordHashed = crypto.createHash('sha256').update(managerPassword).digest('hex');
+                const passwordHashed = crypto.createHash('sha256').update(managerPassword).digest('hex');
 
                 await db_connection.query(`LOCK TABLES USER WRITE`);
 
-                await db_connection.query(`INSERT INTO USER (userEmail, userName, userRole, userPassword) VALUES (?, ?, ?, ?)`, [req.body.officialEmail, req.body.officialName, req.body.officialRole, managerPassword]);
+                await db_connection.query(`INSERT INTO USER (userEmail, userName, userRole, userPassword) VALUES (?, ?, ?, ?)`, [req.body.officialEmail, req.body.officialName, req.body.officialRole, passwordHashed]);
 
                 await db_connection.query(`UNLOCK TABLES`);
 
