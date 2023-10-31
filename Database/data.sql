@@ -116,18 +116,23 @@ VALUES (
     'abhinavramki@gmail.com',
     'Abhinav R',
     '0',
-    'abhinav123'
+    '7a310ecc623837762671b2a2bb14856fc154872525884f69992f38b247dfc67c'
   );
+-- abhinav123
 INSERT INTO USER (userEmail, userName, userRole, userPassword)
 VALUES (
     'venky@gmail.com',
     'Venkatakrishnan',
     '1',
-    'venky123'
+    'f33e05981c592dac551da71cd23ddadfa1c25e4e2974fa3bff312f32af134c34'
   );
+-- venky123
 INSERT INTO USER (userEmail, userName, userRole, userPassword)
 VALUES ('ash@gmail.com', 'Ashwin', '0', '267cc9179965323feff48ca29ac366872c095b0762207b17384b1d1cd77c06c7');
 -- ash123456
+INSERT INTO USER (userEmail, userName, userRole, userPassword)
+VALUES ('hamsini@gmail.com', 'Hamsini', '2', '5f67b3e20d12737657949cfbcb7b262a254d45e7c2025842ddadccf9412aea31');
+-- hamsini123
 INSERT INTO USER (userEmail, userName, userRole, userPassword)
 VALUES ('sajith@gmail.com', 'Sajith', '3', '9fddbb5a442df0b1626b0f4d7c130054bbd2b8f88e170af158eb31a3e47095c6');
 -- sajith123456
