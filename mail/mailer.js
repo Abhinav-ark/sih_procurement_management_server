@@ -4,10 +4,10 @@ const TEMPLATE_OFFICIAL_CREATED = require('./template_acc_reg');
 const TEMPLATE_VENDOR_CREATED = require('./template_vendor_acc_reg');
 
 const transporter = mailer.createTransport({
-    service: 'Gmail',
+    service: '<service>',
     auth: {
-        user: 'noreply.neepco@gmail.com',
-        pass: 'vquzimuuwchzvefz'
+        user: '<email>',
+        pass: '<pass>'
     }
 });
 
@@ -16,7 +16,7 @@ module.exports = {
         var mailOptions = {
             from: {
                 name: "NEEPCO Procurement Management",
-                address: 'noreply.neepco@gmail.com'
+                address: '<email>'
             },
             to: userEmail,
             subject: 'Welcome to NEEPCO Procurement Management Platform',
@@ -36,7 +36,7 @@ module.exports = {
         var mailOptions = {
             from: {
                 name: "NEEPCO Procurement Management",
-                address: 'noreply.neepco@gmail.com'
+                address: '<email>'
             },
             to: userEmail,
             subject: 'Welcome to NEEPCO Procurement Management Platform',
