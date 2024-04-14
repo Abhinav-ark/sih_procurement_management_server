@@ -21,6 +21,8 @@ npm start
 # Use Case
 ![USE CASE](./Assets/sih_use_case.png)
 
+> [!Note]
+> This project was done as a part of Smart India Hackathon 2023.
 
 # Links
 Link to [`Frontend Repository`](https://github.com/Ashrockzzz2003/sih_neepco_web)
